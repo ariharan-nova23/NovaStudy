@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Quiz — SmartExam AI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/quiz.css">
+</head>
+<body>
+
+  <aside class="app-sidebar">
+    <div class="brand-logo">
+      <div class="logo-icon">🧠</div>
+      <div class="brand-title">SmartExam AI</div>
+    </div>
+
+    <div class="nav-section-label">Main Navigation</div>
+    <ul class="nav-links">
+      <li class="nav-item"><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="analyze.html"><span class="nav-icon">📄</span> <span>Analyze Papers</span></a></li>
+      <li class="nav-item"><a href="predictions.html"><span class="nav-icon">🔥</span> <span>Predictions</span></a></li>
+      <li class="nav-item"><a href="generate-paper.html"><span class="nav-icon">📝</span> <span>Generate Paper</span></a></li>
+      <li class="nav-item active"><a href="quiz.html"><span class="nav-icon">💡</span> <span>AI Quiz</span></a></li>
+      <li class="nav-item"><a href="mock-exam.html"><span class="nav-icon">⏱️</span> <span>Mock Exam</span></a></li>
+      <li class="nav-item"><a href="study-plan.html"><span class="nav-icon">📅</span> <span>Study Plan</span></a></li>
+      <li class="nav-item"><a href="progress.html"><span class="nav-icon">📈</span> <span>Progress</span></a></li>
+      <li class="nav-item"><a href="tutor.html"><span class="nav-icon">🤖</span> <span>AI Tutor</span></a></li>
+    </ul>
+
+    <div class="user-profile-widget">
+      <div class="avatar">SA</div>
+      <div style="font-size: 0.85rem;">
+        <strong style="display: block; color: var(--text-main);">Alex Rivera</strong>
+        <span style="color: var(--text-dim);">Computer Science</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-title-box">
+        <h1>AI Interactive & Adaptive Quiz System</h1>
+      </div>
+      <div class="subject-selector-wrap">
+        <select id="globalSubjectSelect">
+          <option value="dsa">Data Structures & Algorithms</option>
+          <option value="os">Operating Systems</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="content-container">
+      
+      <!-- Quiz Configuration Card -->
+      <div id="quizConfigBox" class="card" style="margin-bottom: 2rem;">
+        <h3 class="card-title" style="margin-bottom: 1rem;">🎯 Configure Quiz Session</h3>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Quiz Mode</label>
+            <select id="quizModeSelect" style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+              <option value="Quick Quiz">Quick Quiz (5 Questions)</option>
+              <option value="Adaptive Quiz">Adaptive Quiz (Difficulty auto-adjusts)</option>
+              <option value="Important Topics Quiz">Important Topics Quiz</option>
+              <option value="Topic Quiz">Topic Quiz (Graphs & Trees)</option>
+              <option value="Unit Quiz">Unit Quiz (Unit 4 & 5)</option>
+              <option value="Previous Paper Quiz">Previous Paper Practice</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Number of Questions</label>
+            <select id="quizNumInput" style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+              <option value="5">5 Questions</option>
+              <option value="10" selected>10 Questions</option>
+              <option value="20">20 Questions</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Difficulty Mode</label>
+            <select id="quizDiffSelect" style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+              <option value="Adaptive">Adaptive Mode 🤖</option>
+              <option value="Easy">Easy Mode</option>
+              <option value="Medium">Medium Mode</option>
+              <option value="Hard">Hard Mode</option>
+            </select>
+          </div>
+
+          <div style="grid-column: span 3; display: flex; justify-content: flex-end;">
+            <button id="startQuizBtn" class="btn btn-primary" style="padding: 0.75rem 2rem;">🚀 Start Quiz Now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Quiz Player -->
+      <div id="quizPlayerContainer" style="display: none;">
+        <div style="margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700; color: var(--text-dim); margin-bottom: 0.5rem;">
+            <span id="quizProgressHeader">Question 1 of 10</span>
+            <span style="color: var(--accent-cyan);">Adaptive Intelligence Active</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="quizProgressBarFill" class="progress-bar-fill" style="width: 10%;"></div>
+          </div>
+        </div>
+
+        <div id="quizQuestionCard" class="quiz-card">
+          <!-- Rendered via quiz.js -->
+        </div>
+      </div>
+
+      <!-- Result Summary Box -->
+      <div id="quizResultSummaryBox" style="display: none;">
+        <!-- Rendered after quiz submission -->
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/quiz.js"></script>
+</body>
+</html>

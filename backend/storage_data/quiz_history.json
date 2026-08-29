@@ -1,0 +1,18 @@
+[
+  {
+    "id": "qhist_1",
+    "subject_id": "dsa",
+    "score": 8,
+    "total": 10,
+    "date": "2026-08-25",
+    "quiz_type": "Quick Quiz"
+  },
+  {
+    "id": "qhist_2",
+    "subject_id": "dsa",
+    "score": 9,
+    "total": 10,
+    "date": "2026-08-28",
+    "quiz_type": "Topic Quiz - Graphs"
+  }
+]

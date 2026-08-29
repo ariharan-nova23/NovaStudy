@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predictions — SmartExam AI</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <aside class="app-sidebar">
+    <div class="brand-logo">
+      <div class="logo-icon">🧠</div>
+      <div class="brand-title">SmartExam AI</div>
+    </div>
+
+    <div class="nav-section-label">Main Navigation</div>
+    <ul class="nav-links">
+      <li class="nav-item"><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="analyze.html"><span class="nav-icon">📄</span> <span>Analyze Papers</span></a></li>
+      <li class="nav-item active"><a href="predictions.html"><span class="nav-icon">🔥</span> <span>Predictions</span></a></li>
+      <li class="nav-item"><a href="generate-paper.html"><span class="nav-icon">📝</span> <span>Generate Paper</span></a></li>
+      <li class="nav-item"><a href="quiz.html"><span class="nav-icon">💡</span> <span>AI Quiz</span></a></li>
+      <li class="nav-item"><a href="mock-exam.html"><span class="nav-icon">⏱️</span> <span>Mock Exam</span></a></li>
+      <li class="nav-item"><a href="study-plan.html"><span class="nav-icon">📅</span> <span>Study Plan</span></a></li>
+      <li class="nav-item"><a href="progress.html"><span class="nav-icon">📈</span> <span>Progress</span></a></li>
+      <li class="nav-item"><a href="tutor.html"><span class="nav-icon">🤖</span> <span>AI Tutor</span></a></li>
+    </ul>
+
+    <div class="user-profile-widget">
+      <div class="avatar">SA</div>
+      <div style="font-size: 0.85rem;">
+        <strong style="display: block; color: var(--text-main);">Alex Rivera</strong>
+        <span style="color: var(--text-dim);">Computer Science</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-title-box">
+        <h1>AI Priority Scores & Exam Pattern Predictions</h1>
+      </div>
+      <div class="subject-selector-wrap">
+        <select id="globalSubjectSelect">
+          <option value="dsa">Data Structures & Algorithms</option>
+          <option value="os">Operating Systems</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="content-container">
+      
+      <!-- Disclaimer Banner -->
+      <div style="padding: 1rem 1.25rem; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; margin-bottom: 2rem; font-size: 0.85rem; color: #c7d2fe;">
+        <strong>📌 AI Prediction Disclaimer:</strong>
+        <span id="predictionsDisclaimer">
+          AI Priority Scores indicate high-probability exam topics based on multi-year recurrence, marks weightage, and syllabus weighting. Predictions are pattern-based and not guaranteed.
+        </span>
+      </div>
+
+      <!-- High Priority Topics -->
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">🔥 Most Important Exam Topics</h2>
+      <div class="grid-3" id="importantTopicsGrid" style="margin-bottom: 2rem;">
+        <!-- Rendered via predictions.js -->
+      </div>
+
+      <!-- Likely Question Types -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <h3 class="card-title" style="margin-bottom: 1rem;">🎯 Likely Question Types Probability</h3>
+        <div id="likelyTypesContainer">
+          <!-- Rendered via predictions.js -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/predictions.js"></script>
+</body>
+</html>

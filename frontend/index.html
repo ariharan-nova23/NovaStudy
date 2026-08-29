@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartExam AI — AI Exam Analyzer & Smart Study Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="app-sidebar">
+    <div class="brand-logo">
+      <div class="logo-icon">🧠</div>
+      <div class="brand-title">SmartExam AI</div>
+    </div>
+
+    <div class="nav-section-label">Main Navigation</div>
+    <ul class="nav-links">
+      <li class="nav-item active"><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="analyze.html"><span class="nav-icon">📄</span> <span>Analyze Papers</span></a></li>
+      <li class="nav-item"><a href="predictions.html"><span class="nav-icon">🔥</span> <span>Predictions</span></a></li>
+      <li class="nav-item"><a href="generate-paper.html"><span class="nav-icon">📝</span> <span>Generate Paper</span></a></li>
+      <li class="nav-item"><a href="quiz.html"><span class="nav-icon">💡</span> <span>AI Quiz</span></a></li>
+      <li class="nav-item"><a href="mock-exam.html"><span class="nav-icon">⏱️</span> <span>Mock Exam</span></a></li>
+      <li class="nav-item"><a href="study-plan.html"><span class="nav-icon">📅</span> <span>Study Plan</span></a></li>
+      <li class="nav-item"><a href="progress.html"><span class="nav-icon">📈</span> <span>Progress</span></a></li>
+      <li class="nav-item"><a href="tutor.html"><span class="nav-icon">🤖</span> <span>AI Tutor</span></a></li>
+    </ul>
+
+    <div class="user-profile-widget">
+      <div class="avatar">SA</div>
+      <div style="font-size: 0.85rem;">
+        <strong style="display: block; color: var(--text-main);">Alex Rivera</strong>
+        <span style="color: var(--text-dim);">Computer Science</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-title-box">
+        <h1>Welcome to SmartExam AI</h1>
+      </div>
+      <div class="subject-selector-wrap">
+        <select id="globalSubjectSelect">
+          <option value="dsa">Data Structures & Algorithms</option>
+          <option value="os">Operating Systems</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="content-container" style="text-align: center; padding: 4rem 2rem;">
+      <div class="card" style="padding: 3rem; background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1)); border: 1px solid rgba(99,102,241,0.3);">
+        <div style="font-size: 3.5rem; margin-bottom: 1rem;">🚀</div>
+        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; background: linear-gradient(135deg, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          Smart Exam Preparation & Pattern Intelligence
+        </h1>
+        <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 700px; margin: 0 auto 2rem auto;">
+          Analyze previous question papers, extract exam patterns, calculate AI priority scores, generate model papers, attempt adaptive quizzes, and follow a personalized study plan.
+        </p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+          <a href="dashboard.html" class="btn btn-primary" style="font-size: 1rem; padding: 0.85rem 1.75rem;">Open Dashboard →</a>
+          <a href="analyze.html" class="btn btn-secondary" style="font-size: 1rem; padding: 0.85rem 1.75rem;">Upload Question Papers 📄</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+</body>
+</html>

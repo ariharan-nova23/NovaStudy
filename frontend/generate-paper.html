@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Model Paper — SmartExam AI</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <aside class="app-sidebar">
+    <div class="brand-logo">
+      <div class="logo-icon">🧠</div>
+      <div class="brand-title">SmartExam AI</div>
+    </div>
+
+    <div class="nav-section-label">Main Navigation</div>
+    <ul class="nav-links">
+      <li class="nav-item"><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="analyze.html"><span class="nav-icon">📄</span> <span>Analyze Papers</span></a></li>
+      <li class="nav-item"><a href="predictions.html"><span class="nav-icon">🔥</span> <span>Predictions</span></a></li>
+      <li class="nav-item active"><a href="generate-paper.html"><span class="nav-icon">📝</span> <span>Generate Paper</span></a></li>
+      <li class="nav-item"><a href="quiz.html"><span class="nav-icon">💡</span> <span>AI Quiz</span></a></li>
+      <li class="nav-item"><a href="mock-exam.html"><span class="nav-icon">⏱️</span> <span>Mock Exam</span></a></li>
+      <li class="nav-item"><a href="study-plan.html"><span class="nav-icon">📅</span> <span>Study Plan</span></a></li>
+      <li class="nav-item"><a href="progress.html"><span class="nav-icon">📈</span> <span>Progress</span></a></li>
+      <li class="nav-item"><a href="tutor.html"><span class="nav-icon">🤖</span> <span>AI Tutor</span></a></li>
+    </ul>
+
+    <div class="user-profile-widget">
+      <div class="avatar">SA</div>
+      <div style="font-size: 0.85rem;">
+        <strong style="display: block; color: var(--text-main);">Alex Rivera</strong>
+        <span style="color: var(--text-dim);">Computer Science</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-title-box">
+        <h1>AI Model Question Paper Generator & Validation System</h1>
+      </div>
+      <div class="subject-selector-wrap">
+        <select id="globalSubjectSelect">
+          <option value="dsa">Data Structures & Algorithms</option>
+          <option value="os">Operating Systems</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="content-container">
+      
+      <!-- Configurator Form Card -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <h3 class="card-title" style="margin-bottom: 1rem;">⚙️ Paper Generation Parameters</h3>
+
+        <form id="modelPaperConfigForm" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Total Marks</label>
+            <input type="number" id="paperMarksInput" value="100" style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Exam Duration (Minutes)</label>
+            <input type="number" id="paperDurationInput" value="180" style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Question Strategy / Pattern</label>
+            <select id="paperDifficultySelect" style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+              <option value="Balanced">Balanced (Standard Distribution)</option>
+              <option value="High-Priority Topics">High-Priority Topics Focus</option>
+              <option value="University Pattern">University Exam Pattern</option>
+              <option value="Hard Practice">Hard Practice Mode</option>
+              <option value="Surprise Practice">Surprise Practice Mode</option>
+            </select>
+          </div>
+
+          <div style="grid-column: span 3; display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">⚡ Generate & Validate Model Paper</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Multi-step Validation Box -->
+      <div id="validationProgressBox" class="card" style="display: none; margin-bottom: 2rem; border-color: var(--accent-primary);">
+        <!-- Animated checks via paper-generator.js -->
+      </div>
+
+      <!-- Generated Paper View -->
+      <div id="generatedPaperResultView" style="display: none;">
+        <!-- Rendered model paper -->
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/paper-generator.js"></script>
+</body>
+</html>

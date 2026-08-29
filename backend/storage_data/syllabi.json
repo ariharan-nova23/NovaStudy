@@ -1,0 +1,267 @@
+{
+  "dsa": {
+    "subject_id": "dsa",
+    "subject_name": "Data Structures & Algorithms",
+    "units": [
+      {
+        "unit": "Unit 1",
+        "title": "Arrays, Stacks & Queues",
+        "topics": [
+          {
+            "name": "Arrays & Sparse Matrices",
+            "subtopics": [
+              "Array Operations",
+              "Sparse Matrix Representation"
+            ]
+          },
+          {
+            "name": "Stacks",
+            "subtopics": [
+              "Array Implementation",
+              "Infix to Postfix",
+              "Expression Evaluation"
+            ]
+          },
+          {
+            "name": "Queues",
+            "subtopics": [
+              "Linear Queue",
+              "Circular Queue",
+              "Priority Queue",
+              "Deque"
+            ]
+          }
+        ]
+      },
+      {
+        "unit": "Unit 2",
+        "title": "Linked Lists & Memory Management",
+        "topics": [
+          {
+            "name": "Singly Linked List",
+            "subtopics": [
+              "Insertion & Deletion",
+              "Reversal",
+              "Cycle Detection"
+            ]
+          },
+          {
+            "name": "Doubly & Circular List",
+            "subtopics": [
+              "Doubly Linked List",
+              "Circular Linked List"
+            ]
+          },
+          {
+            "name": "Applications of Linked List",
+            "subtopics": [
+              "Polynomial Addition",
+              "Memory Allocation"
+            ]
+          }
+        ]
+      },
+      {
+        "unit": "Unit 3",
+        "title": "Trees & Binary Search Trees",
+        "topics": [
+          {
+            "name": "Trees & Traversals",
+            "subtopics": [
+              "Binary Tree",
+              "Inorder, Preorder, Postorder",
+              "Threaded Tree"
+            ]
+          },
+          {
+            "name": "Binary Search Trees",
+            "subtopics": [
+              "BST Insertion & Deletion",
+              "BST Search Complexity"
+            ]
+          },
+          {
+            "name": "Balanced Trees",
+            "subtopics": [
+              "AVL Trees & Rotations",
+              "Red-Black Trees",
+              "B-Trees"
+            ]
+          }
+        ]
+      },
+      {
+        "unit": "Unit 4",
+        "title": "Graphs & Graph Algorithms",
+        "topics": [
+          {
+            "name": "Graph Representation",
+            "subtopics": [
+              "Adjacency Matrix",
+              "Adjacency List"
+            ]
+          },
+          {
+            "name": "Graph Traversal",
+            "subtopics": [
+              "Breadth First Search (BFS)",
+              "Depth First Search (DFS)"
+            ]
+          },
+          {
+            "name": "Spanning Trees & Shortest Path",
+            "subtopics": [
+              "Kruskal's Algorithm",
+              "Prim's Algorithm",
+              "Dijkstra's Algorithm"
+            ]
+          }
+        ]
+      },
+      {
+        "unit": "Unit 5",
+        "title": "Sorting, Searching & Hashing",
+        "topics": [
+          {
+            "name": "Searching Algorithms",
+            "subtopics": [
+              "Linear Search",
+              "Binary Search"
+            ]
+          },
+          {
+            "name": "Sorting Algorithms",
+            "subtopics": [
+              "Bubble Sort",
+              "Merge Sort",
+              "Quick Sort",
+              "Heap Sort"
+            ]
+          },
+          {
+            "name": "Hashing",
+            "subtopics": [
+              "Hash Functions",
+              "Collision Resolution",
+              "Chaining & Open Addressing"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "os": {
+    "subject_id": "os",
+    "subject_name": "Operating Systems",
+    "units": [
+      {
+        "unit": "Unit 1",
+        "title": "OS Introduction & Process Management",
+        "topics": [
+          {
+            "name": "System Structure",
+            "subtopics": [
+              "Dual Mode",
+              "System Calls",
+              "OS Architecture"
+            ]
+          },
+          {
+            "name": "Process Management",
+            "subtopics": [
+              "Process Control Block (PCB)",
+              "Process States",
+              "Context Switch"
+            ]
+          }
+        ]
+      },
+      {
+        "unit": "Unit 2",
+        "title": "CPU Scheduling & Synchronization",
+        "topics": [
+          {
+            "name": "CPU Scheduling",
+            "subtopics": [
+              "FCFS",
+              "SJF",
+              "Round Robin",
+              "Priority Scheduling"
+            ]
+          },
+          {
+            "name": "Process Synchronization",
+            "subtopics": [
+              "Critical Section Problem",
+              "Semaphores",
+              "Monitors",
+              "Mutex"
+            ]
+          }
+        ]
+      },
+      {
+        "unit": "Unit 3",
+        "title": "Deadlocks",
+        "topics": [
+          {
+            "name": "Deadlock Fundamentals",
+            "subtopics": [
+              "Characterization",
+              "Resource Allocation Graph"
+            ]
+          },
+          {
+            "name": "Deadlock Handling",
+            "subtopics": [
+              "Banker's Algorithm",
+              "Deadlock Prevention",
+              "Deadlock Detection"
+            ]
+          }
+        ]
+      },
+      {
+        "unit": "Unit 4",
+        "title": "Memory Management & Virtual Memory",
+        "topics": [
+          {
+            "name": "Main Memory",
+            "subtopics": [
+              "Paging",
+              "Segmentation",
+              "Fragmentation"
+            ]
+          },
+          {
+            "name": "Virtual Memory",
+            "subtopics": [
+              "Demand Paging",
+              "Page Replacement (FIFO, LRU, Optimal)"
+            ]
+          }
+        ]
+      },
+      {
+        "unit": "Unit 5",
+        "title": "File & Storage Systems",
+        "topics": [
+          {
+            "name": "File Systems",
+            "subtopics": [
+              "File Allocation Methods",
+              "Directory Structure"
+            ]
+          },
+          {
+            "name": "Disk Management",
+            "subtopics": [
+              "Disk Scheduling (FCFS, SSTF, SCAN, C-SCAN)",
+              "RAID Levels"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — SmartExam AI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <aside class="app-sidebar">
+    <div class="brand-logo">
+      <div class="logo-icon">🧠</div>
+      <div class="brand-title">SmartExam AI</div>
+    </div>
+
+    <div class="nav-section-label">Main Navigation</div>
+    <ul class="nav-links">
+      <li class="nav-item active"><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="analyze.html"><span class="nav-icon">📄</span> <span>Analyze Papers</span></a></li>
+      <li class="nav-item"><a href="predictions.html"><span class="nav-icon">🔥</span> <span>Predictions</span></a></li>
+      <li class="nav-item"><a href="generate-paper.html"><span class="nav-icon">📝</span> <span>Generate Paper</span></a></li>
+      <li class="nav-item"><a href="quiz.html"><span class="nav-icon">💡</span> <span>AI Quiz</span></a></li>
+      <li class="nav-item"><a href="mock-exam.html"><span class="nav-icon">⏱️</span> <span>Mock Exam</span></a></li>
+      <li class="nav-item"><a href="study-plan.html"><span class="nav-icon">📅</span> <span>Study Plan</span></a></li>
+      <li class="nav-item"><a href="progress.html"><span class="nav-icon">📈</span> <span>Progress</span></a></li>
+      <li class="nav-item"><a href="tutor.html"><span class="nav-icon">🤖</span> <span>AI Tutor</span></a></li>
+    </ul>
+
+    <div class="user-profile-widget">
+      <div class="avatar">SA</div>
+      <div style="font-size: 0.85rem;">
+        <strong style="display: block; color: var(--text-main);">Alex Rivera</strong>
+        <span style="color: var(--text-dim);">Computer Science</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-title-box">
+        <h1>Student Dashboard</h1>
+      </div>
+      <div class="subject-selector-wrap">
+        <select id="globalSubjectSelect">
+          <option value="dsa">Data Structures & Algorithms</option>
+          <option value="os">Operating Systems</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="content-container">
+      
+      <!-- Top Metrics Row -->
+      <div class="grid-4" style="margin-bottom: 2rem;">
+        <div class="card metric-card">
+          <div class="metric-icon-wrap icon-purple">📅</div>
+          <div class="metric-info">
+            <div class="label">Exam Countdown</div>
+            <div class="value" id="examCountdown">12 Days</div>
+          </div>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-icon-wrap icon-cyan">🎯</div>
+          <div class="metric-info" style="width: 100%;">
+            <div class="label">Preparation Level</div>
+            <div class="value" id="prepPercentage">68%</div>
+            <div class="progress-bar-bg">
+              <div id="prepProgressBar" class="progress-bar-fill" style="width: 68%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-icon-wrap icon-emerald">📑</div>
+          <div class="metric-info">
+            <div class="label">Papers / Questions</div>
+            <div class="value"><span id="totalPapers">4</span> / <span id="totalQuestions">16</span></div>
+          </div>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-icon-wrap icon-amber">🏆</div>
+          <div class="metric-info">
+            <div class="label">Latest Quiz Score</div>
+            <div class="value" id="latestQuizScore">8/10</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Dashboard Grid -->
+      <div class="grid-2">
+        
+        <!-- Priority Topics Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🔥 High-Priority Topics</h3>
+            <a href="predictions.html" style="color: var(--accent-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none;">View All →</a>
+          </div>
+
+          <div id="priorityTopicsList">
+            <!-- Dynamic Priority List Items -->
+          </div>
+
+          <div class="recommendation-box" style="margin-top: 1.5rem;">
+            <div style="font-size: 1.5rem;">💡</div>
+            <div>
+              <strong style="font-size: 0.9rem; color: var(--accent-cyan); display: block; margin-bottom: 0.2rem;">AI Recommendation:</strong>
+              <div id="recommendationText" style="font-size: 0.85rem; color: var(--text-muted);">
+                Revise BFS and DFS graph traversals and practice step-by-step AVL tree rotations.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Syllabus Unit Weightage Chart -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📊 Weightage Distribution</h3>
+          </div>
+          <div style="position: relative; height: 260px;">
+            <canvas id="dashboardOverviewChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

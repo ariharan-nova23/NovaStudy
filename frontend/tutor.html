@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tutor — SmartExam AI</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <aside class="app-sidebar">
+    <div class="brand-logo">
+      <div class="logo-icon">🧠</div>
+      <div class="brand-title">SmartExam AI</div>
+    </div>
+
+    <div class="nav-section-label">Main Navigation</div>
+    <ul class="nav-links">
+      <li class="nav-item"><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="analyze.html"><span class="nav-icon">📄</span> <span>Analyze Papers</span></a></li>
+      <li class="nav-item"><a href="predictions.html"><span class="nav-icon">🔥</span> <span>Predictions</span></a></li>
+      <li class="nav-item"><a href="generate-paper.html"><span class="nav-icon">📝</span> <span>Generate Paper</span></a></li>
+      <li class="nav-item"><a href="quiz.html"><span class="nav-icon">💡</span> <span>AI Quiz</span></a></li>
+      <li class="nav-item"><a href="mock-exam.html"><span class="nav-icon">⏱️</span> <span>Mock Exam</span></a></li>
+      <li class="nav-item"><a href="study-plan.html"><span class="nav-icon">📅</span> <span>Study Plan</span></a></li>
+      <li class="nav-item"><a href="progress.html"><span class="nav-icon">📈</span> <span>Progress</span></a></li>
+      <li class="nav-item active"><a href="tutor.html"><span class="nav-icon">🤖</span> <span>AI Tutor</span></a></li>
+    </ul>
+
+    <div class="user-profile-widget">
+      <div class="avatar">SA</div>
+      <div style="font-size: 0.85rem;">
+        <strong style="display: block; color: var(--text-main);">Alex Rivera</strong>
+        <span style="color: var(--text-dim);">Computer Science</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-title-box">
+        <h1>AI Study Assistant & Concept Tutor</h1>
+      </div>
+      <div class="subject-selector-wrap">
+        <select id="globalSubjectSelect">
+          <option value="dsa">Data Structures & Algorithms</option>
+          <option value="os">Operating Systems</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="content-container">
+      
+      <!-- Quick Prompts Card -->
+      <div style="margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <button class="btn btn-secondary" style="font-size: 0.85rem;" onclick="sendQuickPrompt('Explain BFS graph traversal algorithm in detail.')">💡 Explain BFS</button>
+        <button class="btn btn-secondary" style="font-size: 0.85rem;" onclick="sendQuickPrompt('I have 2 days left before my exam. What should I study?')">🔥 I have 2 days left. What should I study?</button>
+        <button class="btn btn-secondary" style="font-size: 0.85rem;" onclick="sendQuickPrompt('Explain why I got Question 7 wrong in my quiz.')">❓ Explain why I got Question 7 wrong</button>
+        <button class="btn btn-secondary" style="font-size: 0.85rem;" onclick="sendQuickPrompt('Give me a sample 10-mark question from Trees.')">📝 Generate 10-mark Tree question</button>
+      </div>
+
+      <!-- Chat Container -->
+      <div class="card" style="height: 520px; display: flex; flex-direction: column; padding: 1.5rem;">
+        <div id="tutorMessagesBox" style="flex: 1; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1rem;">
+          
+          <!-- Initial Welcome Message -->
+          <div style="display: flex; justify-content: flex-start; margin-bottom: 1rem;">
+            <div style="max-width: 80%; padding: 1rem 1.25rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; font-size: 0.95rem; line-height: 1.6;">
+              👋 Hello Alex! I am your <strong>SmartExam AI Assistant</strong>.<br>
+              I have indexed your syllabus and previous question papers for <strong>Data Structures & Algorithms</strong>.<br><br>
+              How can I assist your study session today? Feel free to ask concept explanations, exam strategy advice, or question breakdowns!
+            </div>
+          </div>
+
+        </div>
+
+        <form id="tutorChatForm" style="display: flex; gap: 0.75rem;">
+          <input type="text" id="tutorQueryInput" placeholder="Ask your AI Tutor (e.g., Explain BFS, Give 5 questions from Unit 3)..." style="flex: 1; padding: 0.85rem 1.25rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-family: inherit; font-size: 0.95rem;">
+          <button type="submit" class="btn btn-primary" style="padding: 0 1.5rem;">Send 🚀</button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/tutor.js"></script>
+</body>
+</html>

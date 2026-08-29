@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analyze Papers — SmartExam AI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <aside class="app-sidebar">
+    <div class="brand-logo">
+      <div class="logo-icon">🧠</div>
+      <div class="brand-title">SmartExam AI</div>
+    </div>
+
+    <div class="nav-section-label">Main Navigation</div>
+    <ul class="nav-links">
+      <li class="nav-item"><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+      <li class="nav-item active"><a href="analyze.html"><span class="nav-icon">📄</span> <span>Analyze Papers</span></a></li>
+      <li class="nav-item"><a href="predictions.html"><span class="nav-icon">🔥</span> <span>Predictions</span></a></li>
+      <li class="nav-item"><a href="generate-paper.html"><span class="nav-icon">📝</span> <span>Generate Paper</span></a></li>
+      <li class="nav-item"><a href="quiz.html"><span class="nav-icon">💡</span> <span>AI Quiz</span></a></li>
+      <li class="nav-item"><a href="mock-exam.html"><span class="nav-icon">⏱️</span> <span>Mock Exam</span></a></li>
+      <li class="nav-item"><a href="study-plan.html"><span class="nav-icon">📅</span> <span>Study Plan</span></a></li>
+      <li class="nav-item"><a href="progress.html"><span class="nav-icon">📈</span> <span>Progress</span></a></li>
+      <li class="nav-item"><a href="tutor.html"><span class="nav-icon">🤖</span> <span>AI Tutor</span></a></li>
+    </ul>
+
+    <div class="user-profile-widget">
+      <div class="avatar">SA</div>
+      <div style="font-size: 0.85rem;">
+        <strong style="display: block; color: var(--text-main);">Alex Rivera</strong>
+        <span style="color: var(--text-dim);">Computer Science</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-title-box">
+        <h1>Question Paper Upload & Pattern Analysis Engine</h1>
+      </div>
+      <div class="subject-selector-wrap">
+        <select id="globalSubjectSelect">
+          <option value="dsa">Data Structures & Algorithms</option>
+          <option value="os">Operating Systems</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="content-container">
+      
+      <!-- Upload Card -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <h3 class="card-title" style="margin-bottom: 1rem;">📤 Upload Previous Question Papers / Syllabus</h3>
+        
+        <form id="paperUploadForm" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 250px;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">PDF / Scanned Paper Image</label>
+            <input type="file" id="paperFileInput" accept=".pdf,.png,.jpg,.jpeg" style="width: 100%; padding: 0.6rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+          </div>
+
+          <div style="width: 140px;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Exam Year</label>
+            <input type="number" id="paperYearInput" value="2025" min="2018" max="2026" style="width: 100%; padding: 0.6rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+          </div>
+
+          <button type="submit" class="btn btn-primary">⚡ Extract & Analyze</button>
+        </form>
+
+        <div id="uploadStatusMessage" style="margin-top: 1rem; font-size: 0.9rem; display: none;"></div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid-2" style="margin-bottom: 2rem;">
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom: 1rem;">📊 Unit Weightage (%)</h3>
+          <div style="position: relative; height: 260px;">
+            <canvas id="unitDistChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom: 1rem;">🧩 Question Types Breakdown</h3>
+          <div style="position: relative; height: 260px;">
+            <canvas id="typeDistChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Semantic Repeated Questions Table -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <h3 class="card-title" style="margin-bottom: 1rem;">🔁 Semantic Repeated Questions Cluster</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Questions grouped by semantic concept similarity across 2022, 2023, 2024, and 2025 question papers.
+        </p>
+
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Concept & Syllabus Mapping</th>
+                <th>Appeared Years</th>
+                <th>Frequency & Marks</th>
+                <th>Recurrence Trend</th>
+                <th>AI Priority Score</th>
+              </tr>
+            </thead>
+            <tbody id="repeatedQuestionsTableBody">
+              <!-- Rendered via analyze.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Extracted Questions List -->
+      <div class="card">
+        <h3 class="card-title" style="margin-bottom: 1rem;">📑 Extracted Question Repository</h3>
+        <div id="extractedQuestionsList">
+          <!-- Rendered via analyze.js -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/analyze.js"></script>
+</body>
+</html>

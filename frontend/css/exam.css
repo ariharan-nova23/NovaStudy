@@ -1,0 +1,54 @@
+/* Mock Exam specific styles */
+.exam-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+}
+
+.exam-timer-badge {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+}
+
+.question-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.palette-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.palette-btn:hover { background: rgba(255, 255, 255, 0.15); }
+.palette-btn.active { border-color: var(--accent-primary); box-shadow: 0 0 10px rgba(99, 102, 241, 0.5); }
+.palette-btn.answered { background: var(--accent-emerald); color: #000; border-color: var(--accent-emerald); }
+.palette-btn.marked { background: var(--accent-amber); color: #000; border-color: var(--accent-amber); }
+
+.exam-footer-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
