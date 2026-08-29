@@ -24,6 +24,9 @@ async function launchMockExam() {
   if (!paper || !paper.sections) return;
 
   // Flatten questions for exam environment
+  examTimeSeconds = (paper.duration_minutes || 180) * 60;
+  examAnswers = {};
+  examMarkedForReview = new Set();
   currentExamQuestions = [];
   paper.sections.forEach(sec => {
     sec.questions.forEach(q => currentExamQuestions.push(q));

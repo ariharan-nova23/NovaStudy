@@ -44,11 +44,12 @@ async function loadDashboardData(subjectId) {
     recEl.textContent = data.recommendation;
   }
 
-  // Render Chart if Canvas exists
-  renderDashboardChart();
+  // Render a chart from the real analyzed question distribution.
+  const patterns = await APIClient.get(`/api/analysis/patterns/${subjectId}`);
+  if (patterns) renderDashboardChart(patterns.unit_distribution);
 }
 
-function renderDashboardChart() {
+function renderDashboardChart(unitDistribution = {}) {
   const ctx = document.getElementById("dashboardOverviewChart");
   if (!ctx || !window.Chart) return;
 
@@ -57,9 +58,9 @@ function renderDashboardChart() {
   window.myDashChart = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['Graphs', 'Trees', 'Sorting', 'Stacks/Queues', 'Arrays/Memory'],
+      labels: Object.keys(unitDistribution),
       datasets: [{
-        data: [35, 25, 20, 15, 5],
+        data: Object.values(unitDistribution),
         backgroundColor: ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'],
         borderWidth: 0
       }]

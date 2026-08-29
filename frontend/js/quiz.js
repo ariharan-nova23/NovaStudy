@@ -99,40 +99,17 @@ function toggleHint() {
 
 function submitOrNextQuestion() {
   const q = currentQuizQuestions[currentQuestionIndex];
-  const selectedIdx = userAnswers[q.id];
-
-  if (selectedIdx === undefined) {
+  if (userAnswers[q.id] === undefined) {
     alert("Please select an answer option.");
     return;
   }
 
-  // Show correct / incorrect styling
-  const buttons = document.querySelectorAll(".option-btn");
-  buttons.forEach((btn, idx) => {
-    btn.disabled = true;
-    if (idx === q.correct_answer_index) {
-      btn.classList.add("correct");
-    } else if (idx === selectedIdx && selectedIdx !== q.correct_answer_index) {
-      btn.classList.add("incorrect");
-    }
-  });
-
-  const expBox = document.getElementById("explanationBox");
-  if (expBox) {
-    expBox.style.display = "block";
-    expBox.innerHTML = `<strong>${selectedIdx === q.correct_answer_index ? '✓ Correct!' : '❌ Incorrect.'}</strong> ${q.explanation}`;
+  if (currentQuestionIndex < currentQuizQuestions.length - 1) {
+    currentQuestionIndex++;
+    renderQuestion();
+  } else {
+    finishQuiz();
   }
-
-  const nextBtn = document.getElementById("quizSubmitNextBtn");
-  nextBtn.textContent = (currentQuestionIndex === currentQuizQuestions.length - 1) ? 'View Final Results 🏆' : 'Next Question →';
-  nextBtn.onclick = () => {
-    if (currentQuestionIndex < currentQuizQuestions.length - 1) {
-      currentQuestionIndex++;
-      renderQuestion();
-    } else {
-      finishQuiz();
-    }
-  };
 }
 
 function prevQuestion() {

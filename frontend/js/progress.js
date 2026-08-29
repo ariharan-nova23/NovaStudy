@@ -43,8 +43,8 @@ function renderProgressChart(scores) {
 
   if (window.myProgressChart) window.myProgressChart.destroy();
 
-  const labels = scores ? scores.map(s => s.date) : ['Aug 20', 'Aug 22', 'Aug 25', 'Aug 28', 'Today'];
-  const values = scores ? scores.map(s => Math.round((s.score / s.total) * 100)) : [52, 60, 72, 80, 88];
+  const labels = (scores || []).map(s => s.date);
+  const values = (scores || []).map(s => Math.round((s.score / Math.max(1, s.total)) * 100));
 
   window.myProgressChart = new Chart(ctx, {
     type: 'line',

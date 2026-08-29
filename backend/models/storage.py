@@ -1,79 +1,89 @@
 import json
 import os
+import uuid
+from datetime import date
+from pathlib import Path
 from typing import Dict, Any, List
 from backend.config import DATA_DIR
-from backend.data.sample_data import SAMPLE_SYLLABI, SAMPLE_QUESTIONS
 
 class StorageEngine:
     def __init__(self):
-        self.subjects_file = os.path.join(DATA_DIR, "subjects.json")
-        self.questions_file = os.path.join(DATA_DIR, "questions.json")
-        self.syllabi_file = os.path.join(DATA_DIR, "syllabi.json")
-        self.quiz_history_file = os.path.join(DATA_DIR, "quiz_history.json")
-        self.study_plans_file = os.path.join(DATA_DIR, "study_plans.json")
-        self._ensure_initial_data()
+        self.subjects_file = DATA_DIR / "subjects.json"
+        self.questions_file = DATA_DIR / "questions.json"
+        self.syllabi_file = DATA_DIR / "syllabi.json"
+        self.quiz_history_file = DATA_DIR / "quiz_history.json"
+        self.papers_file = DATA_DIR / "papers.json"
+        self.generated_file = DATA_DIR / "generated_papers.json"
+        self.quizzes_file = DATA_DIR / "quizzes.json"
+        self.study_plans_file = DATA_DIR / "study_plans.json"
+        self._ensure_files()
 
-    def _ensure_initial_data(self):
-        if not os.path.exists(self.syllabi_file):
-            with open(self.syllabi_file, "w") as f:
-                json.dump(SAMPLE_SYLLABI, f, indent=2)
+    def _ensure_files(self):
+        defaults = {
+            self.subjects_file: [], self.questions_file: {}, self.syllabi_file: {},
+            self.quiz_history_file: [], self.papers_file: [], self.generated_file: [],
+            self.quizzes_file: {}, self.study_plans_file: {}
+        }
+        for path, default in defaults.items():
+            if not path.exists():
+                self._write(path, default)
 
-        if not os.path.exists(self.questions_file):
-            with open(self.questions_file, "w") as f:
-                json.dump(SAMPLE_QUESTIONS, f, indent=2)
+    def _read(self, path, default):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return default
 
-        if not os.path.exists(self.subjects_file):
-            subjects = [
-                {"id": "dsa", "name": "Data Structures & Algorithms", "exam_days": 12, "preparation": 68},
-                {"id": "os", "name": "Operating Systems", "exam_days": 18, "preparation": 55}
-            ]
-            with open(self.subjects_file, "w") as f:
-                json.dump(subjects, f, indent=2)
+    def _write(self, path, data):
+        tmp = Path(str(path) + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        os.replace(tmp, path)
 
-        if not os.path.exists(self.quiz_history_file):
-            sample_history = [
-                {"id": "qhist_1", "subject_id": "dsa", "score": 8, "total": 10, "date": "2026-08-25", "quiz_type": "Quick Quiz"},
-                {"id": "qhist_2", "subject_id": "dsa", "score": 9, "total": 10, "date": "2026-08-28", "quiz_type": "Topic Quiz - Graphs"}
-            ]
-            with open(self.quiz_history_file, "w") as f:
-                json.dump(sample_history, f, indent=2)
+    def get_subjects(self): return self._read(self.subjects_file, [])
+    def get_syllabi(self): return self._read(self.syllabi_file, {})
+    def get_syllabus(self, subject_id): return self.get_syllabi().get(subject_id)
+    def get_questions(self, subject_id): return self._read(self.questions_file, {}).get(subject_id, [])
 
-    def get_subjects(self) -> List[Dict[str, Any]]:
-        with open(self.subjects_file, "r") as f:
-            return json.load(f)
+    def save_syllabus(self, subject_id, syllabus):
+        all_syllabi = self.get_syllabi(); all_syllabi[subject_id] = syllabus
+        self._write(self.syllabi_file, all_syllabi)
 
-    def get_syllabi(self) -> Dict[str, Any]:
-        with open(self.syllabi_file, "r") as f:
-            return json.load(f)
+    def add_paper(self, subject_id, year, title, filename, question_count):
+        papers = self._read(self.papers_file, [])
+        paper = {"id": f"paper_{uuid.uuid4().hex[:10]}", "subject_id": subject_id, "year": year,
+                 "title": title, "filename": filename, "question_count": question_count,
+                 "uploaded_at": date.today().isoformat()}
+        papers.append(paper); self._write(self.papers_file, papers); return paper
 
-    def get_syllabus(self, subject_id: str) -> Dict[str, Any]:
-        syllabi = self.get_syllabi()
-        return syllabi.get(subject_id, syllabi.get("dsa"))
+    def add_questions(self, subject_id, questions):
+        all_q = self._read(self.questions_file, {})
+        all_q.setdefault(subject_id, []).extend(questions)
+        self._write(self.questions_file, all_q)
 
-    def get_questions(self, subject_id: str) -> List[Dict[str, Any]]:
-        with open(self.questions_file, "r") as f:
-            all_q = json.load(f)
-            return all_q.get(subject_id, all_q.get("dsa", []))
+    def get_papers(self, subject_id):
+        return [p for p in self._read(self.papers_file, []) if p.get("subject_id") == subject_id]
 
-    def add_question(self, subject_id: str, question_dict: Dict[str, Any]):
-        with open(self.questions_file, "r") as f:
-            all_q = json.load(f)
-        if subject_id not in all_q:
-            all_q[subject_id] = []
-        all_q[subject_id].append(question_dict)
-        with open(self.questions_file, "w") as f:
-            json.dump(all_q, f, indent=2)
+    def save_quiz(self, quiz):
+        quizzes = self._read(self.quizzes_file, {}); quizzes[quiz["quiz_id"]] = quiz
+        self._write(self.quizzes_file, quizzes)
 
-    def save_quiz_history(self, quiz_result: Dict[str, Any]):
-        with open(self.quiz_history_file, "r") as f:
-            history = json.load(f)
-        history.append(quiz_result)
-        with open(self.quiz_history_file, "w") as f:
-            json.dump(history, f, indent=2)
+    def get_quiz(self, quiz_id): return self._read(self.quizzes_file, {}).get(quiz_id)
 
-    def get_quiz_history(self, subject_id: str) -> List[Dict[str, Any]]:
-        with open(self.quiz_history_file, "r") as f:
-            history = json.load(f)
-            return [h for h in history if h.get("subject_id") == subject_id]
+    def save_quiz_history(self, result):
+        history = self._read(self.quiz_history_file, []); history.append(result)
+        self._write(self.quiz_history_file, history)
+
+    def get_quiz_history(self, subject_id):
+        return [h for h in self._read(self.quiz_history_file, []) if h.get("subject_id") == subject_id]
+
+    def save_generated_paper(self, paper):
+        papers = self._read(self.generated_file, []); papers.append(paper)
+        self._write(self.generated_file, papers)
+
+    def save_study_plan(self, subject_id, plan):
+        plans = self._read(self.study_plans_file, {}); plans[subject_id] = plan
+        self._write(self.study_plans_file, plans)
 
 storage = StorageEngine()

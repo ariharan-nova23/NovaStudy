@@ -1,152 +1,46 @@
-import uuid
-from typing import List, Dict, Any
+import uuid, random, json
+from backend.services.ai_service import ai_service
+from backend.services.priority_engine import priority_engine
 
 class QuestionGeneratorService:
     @staticmethod
-    def generate_model_paper(
-        subject_name: str,
-        total_marks: int = 100,
-        duration_minutes: int = 180,
-        difficulty_mode: str = "Balanced",
-        num_previous_papers: int = 4
-    ) -> Dict[str, Any]:
-        """
-        Generates a structured, multi-section model question paper with novel concept-based questions.
-        """
-        paper_id = f"model_paper_{uuid.uuid4().hex[:8]}"
+    def generate_model_paper(subject_name, questions, syllabus, total_marks=100, duration_minutes=180, difficulty_mode="Balanced", num_questions=10, num_previous_papers=4):
+        priorities=priority_engine.calculate_topic_priorities(questions)
+        context=json.dumps({"syllabus":syllabus,"priorities":priorities[:12],"past_questions":questions[-60:]},ensure_ascii=False)
+        if ai_service.enabled:
+            prompt=f'''Create a NEW model exam paper for {subject_name}. Use ONLY the supplied syllabus and historical questions as evidence. Do not claim it predicts exact questions. Strategy: {difficulty_mode}. Total marks: {total_marks}. Duration: {duration_minutes} minutes. Return JSON only with keys instructions and sections; each section has section_name,total_section_marks,questions; each question has id,question,marks,unit,topic,difficulty,type. Make the marks sum exactly to {total_marks}. Prefer concept-level novelty instead of copying historical wording. DATA: {context}'''
+            result=ai_service.ask_json(prompt)
+            if result and result.get("sections"):
+                paper={"paper_id":f"model_{uuid.uuid4().hex[:8]}","subject_name":subject_name,"total_marks":total_marks,"duration_minutes":duration_minutes,"difficulty_mode":difficulty_mode,"instructions":result.get("instructions",[]),"sections":result["sections"]}
+                return paper
+        return QuestionGeneratorService._fallback(subject_name,questions,priorities,total_marks,duration_minutes,difficulty_mode,num_questions)
 
-        section_a_qs = [
-            {
-                "id": "mp_q1",
-                "question": "Define Sparse Matrix. Write down the triplet representation of a 4x4 Sparse Matrix with 3 non-zero elements.",
-                "marks": 5,
-                "unit": "Unit 1",
-                "topic": "Arrays & Sparse Matrices",
-                "difficulty": "Easy",
-                "type": "Numerical"
-            },
-            {
-                "id": "mp_q2",
-                "question": "What is a Circular Queue? How does it overcome the limitation of a simple linear array queue?",
-                "marks": 5,
-                "unit": "Unit 1",
-                "topic": "Queues",
-                "difficulty": "Easy",
-                "type": "Explanation"
-            },
-            {
-                "id": "mp_q3",
-                "question": "Compare Singly Linked List vs Doubly Linked List in terms of memory overhead and insertion efficiency.",
-                "marks": 5,
-                "unit": "Unit 2",
-                "topic": "Doubly & Circular List",
-                "difficulty": "Easy",
-                "type": "Comparison"
-            },
-            {
-                "id": "mp_q4",
-                "question": "Define Inorder, Preorder, and Postorder tree traversals. Give an example binary tree with its Inorder sequence.",
-                "marks": 5,
-                "unit": "Unit 3",
-                "topic": "Trees & Traversals",
-                "difficulty": "Easy",
-                "type": "Definition"
-            }
-        ]
-
-        section_b_qs = [
-            {
-                "id": "mp_q5",
-                "question": "Write the Breadth First Search (BFS) graph traversal algorithm. Trace BFS starting from vertex 'V1' for a 6-node weighted graph with vertices {V1, V2, V3, V4, V5, V6}.",
-                "marks": 10,
-                "unit": "Unit 4",
-                "topic": "Graph Traversal",
-                "difficulty": "Medium",
-                "type": "Algorithm"
-            },
-            {
-                "id": "mp_q6",
-                "question": "Explain Dijkstra's algorithm for finding the single-source shortest path. Construct the shortest path tree from source node A to all other nodes for the given graph.",
-                "marks": 10,
-                "unit": "Unit 4",
-                "topic": "Spanning Trees & Shortest Path",
-                "difficulty": "Hard",
-                "type": "Numerical"
-            },
-            {
-                "id": "mp_q7",
-                "question": "Insert the keys 15, 27, 49, 10, 8, 22, 35 into an initially empty AVL Tree. Show step-by-step rotations (LL, RR, LR, RL) performed to maintain balance.",
-                "marks": 10,
-                "unit": "Unit 3",
-                "topic": "Balanced Trees",
-                "difficulty": "Hard",
-                "type": "Numerical"
-            },
-            {
-                "id": "mp_q8",
-                "question": "Explain Quick Sort using Divide and Conquer strategy. Trace Quick Sort for array A = [42, 13, 88, 25, 9, 61, 30]. Discuss best and worst-case time complexity.",
-                "marks": 10,
-                "unit": "Unit 5",
-                "topic": "Sorting Algorithms",
-                "difficulty": "Medium",
-                "type": "Algorithm"
-            }
-        ]
-
-        section_c_qs = [
-            {
-                "id": "mp_q9",
-                "question": "Design a C/C++ program to detect a cycle in a Directed Graph using Depth First Search (DFS) recursion stack. Explain the significance of vertex coloring (WHITE, GRAY, BLACK).",
-                "marks": 20,
-                "unit": "Unit 4",
-                "topic": "Graph Traversal",
-                "difficulty": "Hard",
-                "type": "Programming"
-            },
-            {
-                "id": "mp_q10",
-                "question": "Discuss Collision Resolution in Hashing. Compare Open Addressing (Linear Probing, Quadratic Probing) with Separate Chaining using hash function H(k) = k mod 11.",
-                "marks": 20,
-                "unit": "Unit 5",
-                "topic": "Hashing",
-                "difficulty": "Hard",
-                "type": "Case study"
-            }
-        ]
-
-        sections = [
-            {
-                "section_name": "Section A — Short Answer Questions (Answer all 4 questions, 5 Marks each)",
-                "total_section_marks": 20,
-                "questions": section_a_qs
-            },
-            {
-                "section_name": "Section B — Core Analytical & Algorithmic Questions (Answer all 4 questions, 10 Marks each)",
-                "total_section_marks": 40,
-                "questions": section_b_qs
-            },
-            {
-                "section_name": "Section C — Comprehensive & Advanced Applications (Answer all questions, 20 Marks each)",
-                "total_section_marks": 40,
-                "questions": section_c_qs
-            }
-        ]
-
-        instructions = [
-            "All sections are compulsory unless internal choice is specified.",
-            "Write neat diagrams wherever necessary.",
-            "State time and space complexity assumptions clearly.",
-            "Scientific calculators are permitted if required."
-        ]
-
-        return {
-            "paper_id": paper_id,
-            "subject_name": subject_name,
-            "total_marks": total_marks,
-            "duration_minutes": duration_minutes,
-            "difficulty_mode": difficulty_mode,
-            "instructions": instructions,
-            "sections": sections
-        }
-
-question_generator_service = QuestionGeneratorService()
+    @staticmethod
+    def _fallback(subject_name,questions,priorities,total_marks,duration,difficulty_mode,num_questions):
+        pool=questions[:]
+        if difficulty_mode=="High-Priority Topics":
+            top={p["topic"] for p in priorities[:5]}; pool=[q for q in pool if q.get("topic") in top] or pool
+        elif difficulty_mode=="Hard Practice": pool=[q for q in pool if q.get("difficulty")=="Hard"] or pool
+        elif difficulty_mode=="Surprise Practice": pool=sorted(pool,key=lambda q:q.get("topic",""))
+        else: pool=sorted(pool,key=lambda q:(-next((p["priority_score"] for p in priorities if p["topic"]==q.get("topic")),0),-q.get("marks",0)))
+        chosen=[]; seen=set()
+        for q in pool:
+            topic=q.get("topic")
+            if topic in seen and len(chosen)<4: continue
+            chosen.append(q); seen.add(topic)
+            if len(chosen)>=num_questions: break
+        if not chosen: chosen=pool[:num_questions]
+        # Scale to requested total while keeping realistic buckets.
+        raw=[5 if q.get("marks",0)<=5 else 10 if q.get("marks",0)<=10 else 20 for q in chosen]
+        if sum(raw) != total_marks:
+            # create 3 sections and distribute target marks deterministically
+            base=max(1,total_marks//max(1,len(chosen))); raw=[base]*len(chosen); raw[-1]+=total_marks-sum(raw)
+        sections=[]
+        for i,(q,m) in enumerate(zip(chosen,raw)):
+            item={"id":f"mp_{uuid.uuid4().hex[:7]}","question":f"Practice variant: {q['question']}","marks":m,"unit":q.get("unit",""),"topic":q.get("topic",""),"difficulty":q.get("difficulty","Medium"),"type":q.get("question_type","Explanation")}
+            sec=0 if m<=5 else 1 if m<=10 else 2
+            while len(sections)<=sec: sections.append({"section_name":f"Section {chr(65+len(sections))}","total_section_marks":0,"questions":[]})
+            sections[sec]["questions"].append(item); sections[sec]["total_section_marks"]+=m
+        return {"paper_id":f"model_{uuid.uuid4().hex[:8]}","subject_name":subject_name,"total_marks":total_marks,"duration_minutes":duration,"difficulty_mode":difficulty_mode,
+                "instructions":["Answer all questions unless internal choice is specified.","Base answers on the supplied syllabus."],"sections":[s for s in sections if s["questions"]]}
+question_generator_service=QuestionGeneratorService()

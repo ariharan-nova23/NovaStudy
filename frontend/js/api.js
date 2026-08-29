@@ -8,7 +8,7 @@ class APIClient {
       if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
       return await response.json();
     } catch (error) {
-      console.warn(`GET ${endpoint} failed, fallback data used:`, error);
+      console.warn(`GET ${endpoint} failed:`, error);
       return null;
     }
   }
