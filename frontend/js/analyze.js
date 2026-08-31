@@ -48,7 +48,25 @@ async function handlePaperUpload(e) {
   formData.append("subject_id", getSelectedSubject());
   formData.append("year", yearInput.value || 2025);
 
+  try {
   const res = await APIClient.upload("/api/upload/paper", formData);
+
+  if (res && res.status === "success") {
+    statusEl.innerHTML =
+      `<span style="color: var(--accent-emerald);">
+        ✓ Successfully extracted ${res.extracted_questions_count} questions!
+      </span>`;
+
+    loadAnalysisData(getSelectedSubject());
+  }
+} catch (error) {
+  console.error(error);
+
+  statusEl.innerHTML =
+    `<span style="color: var(--accent-rose);">
+      ❌ ${error.message}
+    </span>`;
+}
 
   if (res && res.status === "success") {
     statusEl.innerHTML = `<span style="color: var(--accent-emerald);">✓ Successfully extracted ${res.extracted_questions_count} structured questions from ${res.title}!</span>`;

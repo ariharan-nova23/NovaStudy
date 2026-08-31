@@ -28,19 +28,27 @@ class APIClient {
     }
   }
 
-  static async upload(endpoint, formData) {
-    try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: "POST",
-        body: formData
-      });
-      if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
-      return await response.json();
-    } catch (error) {
-      console.warn(`UPLOAD ${endpoint} failed:`, error);
-      return null;
+ static async upload(endpoint, formData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail || data.message || `HTTP Error ${response.status}`
+      );
     }
+
+    return data;
+  } catch (error) {
+    console.error(`UPLOAD ${endpoint} failed:`, error);
+    throw error;
   }
+}
 }
 
 // Active subject helper
