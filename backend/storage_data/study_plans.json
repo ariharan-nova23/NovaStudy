@@ -1,1 +1,103 @@
-{}
+{
+  "dsa": {
+    "subject_id": "dsa",
+    "subject_name": "Data Structures & Algorithms",
+    "days_left": 7,
+    "daily_hours": 3.0,
+    "total_days": 7,
+    "schedule": [
+      {
+        "day": 1,
+        "date_str": "Aug 31, 2026",
+        "focus_topic": "Balanced Trees",
+        "unit": "Unit 3",
+        "tasks": [
+          "Study Balanced Trees concepts",
+          "Practice questions from Balanced Trees",
+          "Take a short quiz on Balanced Trees"
+        ],
+        "completed_tasks": [],
+        "estimated_hours": 3.0
+      },
+      {
+        "day": 2,
+        "date_str": "Sep 01, 2026",
+        "focus_topic": "Needs Review",
+        "unit": "Unassigned",
+        "tasks": [
+          "Study Needs Review concepts",
+          "Practice questions from Needs Review",
+          "Take a short quiz on Needs Review"
+        ],
+        "completed_tasks": [],
+        "estimated_hours": 3.0
+      },
+      {
+        "day": 3,
+        "date_str": "Sep 02, 2026",
+        "focus_topic": "Spanning Trees & Shortest Path",
+        "unit": "Unit 4",
+        "tasks": [
+          "Study Spanning Trees & Shortest Path concepts",
+          "Practice questions from Spanning Trees & Shortest Path",
+          "Take a short quiz on Spanning Trees & Shortest Path"
+        ],
+        "completed_tasks": [],
+        "estimated_hours": 3.0
+      },
+      {
+        "day": 4,
+        "date_str": "Sep 03, 2026",
+        "focus_topic": "Graph Traversal",
+        "unit": "Unit 4",
+        "tasks": [
+          "Study Graph Traversal concepts",
+          "Practice questions from Graph Traversal",
+          "Take a short quiz on Graph Traversal"
+        ],
+        "completed_tasks": [],
+        "estimated_hours": 3.0
+      },
+      {
+        "day": 5,
+        "date_str": "Sep 04, 2026",
+        "focus_topic": "Sorting Algorithms",
+        "unit": "Unit 5",
+        "tasks": [
+          "Study Sorting Algorithms concepts",
+          "Practice questions from Sorting Algorithms",
+          "Take a short quiz on Sorting Algorithms"
+        ],
+        "completed_tasks": [],
+        "estimated_hours": 3.0
+      },
+      {
+        "day": 6,
+        "date_str": "Sep 05, 2026",
+        "focus_topic": "Stacks",
+        "unit": "Unit 1",
+        "tasks": [
+          "Study Stacks concepts",
+          "Practice questions from Stacks",
+          "Take a short quiz on Stacks"
+        ],
+        "completed_tasks": [],
+        "estimated_hours": 3.0
+      },
+      {
+        "day": 7,
+        "date_str": "Sep 06, 2026",
+        "focus_topic": "Hashing",
+        "unit": "Unit 5",
+        "tasks": [
+          "Study Hashing concepts",
+          "Practice questions from Hashing",
+          "Take a short quiz on Hashing"
+        ],
+        "completed_tasks": [],
+        "estimated_hours": 3.0
+      }
+    ],
+    "completion_percentage": 0
+  }
+}
