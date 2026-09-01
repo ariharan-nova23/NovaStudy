@@ -1,14 +1,14 @@
 [
   {
     "id": "dsa",
-    "name": "Data Structures & Algorithms",
-    "exam_days": 12,
-    "preparation": 68
+    "name": "Data Structures & Algorithms"
   },
   {
     "id": "os",
-    "name": "Operating Systems",
-    "exam_days": 18,
-    "preparation": 55
+    "name": "Operating Systems"
+  },
+  {
+    "id": "maths",
+    "name": "Mathematics"
   }
 ]
