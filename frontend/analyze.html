@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
   <aside class="app-sidebar">
@@ -18,9 +20,11 @@
     <div class="nav-section-label">Main Navigation</div>
     <ul class="nav-links">
       <li class="nav-item"><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-      <li class="nav-item active"><a href="analyze.html"><span class="nav-icon">📄</span> <span>Analyze Papers</span></a></li>
+      <li class="nav-item active"><a href="analyze.html"><span class="nav-icon">📄</span> <span>Analyze
+            Papers</span></a></li>
       <li class="nav-item"><a href="predictions.html"><span class="nav-icon">🔥</span> <span>Predictions</span></a></li>
-      <li class="nav-item"><a href="generate-paper.html"><span class="nav-icon">📝</span> <span>Generate Paper</span></a></li>
+      <li class="nav-item"><a href="generate-paper.html"><span class="nav-icon">📝</span> <span>Generate
+            Paper</span></a></li>
       <li class="nav-item"><a href="quiz.html"><span class="nav-icon">💡</span> <span>AI Quiz</span></a></li>
       <li class="nav-item"><a href="mock-exam.html"><span class="nav-icon">⏱️</span> <span>Mock Exam</span></a></li>
       <li class="nav-item"><a href="study-plan.html"><span class="nav-icon">📅</span> <span>Study Plan</span></a></li>
@@ -44,27 +48,32 @@
       </div>
       <div class="subject-selector-wrap">
         <select id="globalSubjectSelect">
-          <option value="dsa">Data Structures & Algorithms</option>
-          <option value="os">Operating Systems</option>
+          <option value="">Loading subjects...</option>
         </select>
       </div>
     </header>
 
     <div class="content-container">
-      
+
       <!-- Upload Card -->
       <div class="card" style="margin-bottom: 2rem;">
         <h3 class="card-title" style="margin-bottom: 1rem;">📤 Upload Previous Question Papers / Syllabus</h3>
-        
+
         <form id="paperUploadForm" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 250px;">
-            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">PDF / Scanned Paper Image</label>
-            <input type="file" id="paperFileInput" accept=".pdf,.png,.jpg,.jpeg" style="width: 100%; padding: 0.6rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+            <label
+              style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">PDF
+              / Scanned Paper Image</label>
+            <input type="file" id="paperFileInput" accept=".pdf,.png,.jpg,.jpeg"
+              style="width: 100%; padding: 0.6rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
           </div>
 
           <div style="width: 140px;">
-            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Exam Year</label>
-            <input type="number" id="paperYearInput" value="2025" min="2018" max="2026" style="width: 100%; padding: 0.6rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+            <label
+              style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Exam
+              Year</label>
+            <input type="number" id="paperYearInput" value="2025" min="2018" max="2026"
+              style="width: 100%; padding: 0.6rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
           </div>
 
           <button type="submit" class="btn btn-primary">⚡ Extract & Analyze</button>
@@ -129,4 +138,5 @@
   <script src="js/api.js"></script>
   <script src="js/analyze.js"></script>
 </body>
+
 </html>

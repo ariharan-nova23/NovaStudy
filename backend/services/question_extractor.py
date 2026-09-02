@@ -2,7 +2,6 @@ import re
 import uuid
 from typing import List, Dict, Any
 
-from backend.services.syllabus_mapper import syllabus_mapper_service
 from backend.services.ai_service import ai_service
 
 
@@ -15,585 +14,538 @@ class QuestionExtractorService:
         syllabus: Dict[str, Any] = None
     ) -> List[Dict[str, Any]]:
 
-        # ---------------------------------------------------------
-        # MODE 1:
-        # Syllabus exists → use AI to map questions to syllabus
-        # ---------------------------------------------------------
-        if ai_service.enabled and syllabus:
+        # AI mode when available
+        if ai_service.enabled:
+            syllabus_text = syllabus if syllabus else "No official syllabus available."
 
             prompt = f"""
-Extract all exam questions from this question paper.
+You are an examination question extraction and syllabus mapping system.
 
-Map every question ONLY to the supplied syllabus.
+Extract ONLY actual examination questions.
 
-Return JSON only in this format:
-
-{{
-  "questions": [
-    {{
-      "id": "unique_id",
-      "question": "full question",
-      "year": {paper_year},
-      "marks": 2,
-      "unit": "Unit 1",
-      "topic": "Topic name",
-      "subtopic": "Subtopic name",
-      "question_type": "Numerical",
-      "difficulty": "Easy",
-      "confidence": 0.95,
-      "needs_review": false
-    }}
-  ]
-}}
-
-Rules:
-
-1. Extract only questions actually present in the paper.
-2. Do not invent questions.
-3. Do not invent syllabus topics.
-4. Use the supplied syllabus for unit/topic/subtopic mapping.
-5. If a question cannot confidently be mapped, set needs_review to true.
-6. Preserve the original question wording as much as possible.
-7. Estimate marks only when marks are visible or clearly inferable.
-8. Return valid JSON only.
+IMPORTANT:
+- Ignore lecture notes, textbook explanations, examples, solved examples,
+  headings, page numbers, advertisements, and study material.
+- Do NOT treat lecture examples as exam questions.
+- Do NOT invent questions.
+- Preserve original question wording.
+- Identify the actual subject from the content.
+- If a question is not clearly an exam question, exclude it.
+- Use only syllabus topics when a syllabus is supplied.
+- Return JSON only.
 
 SYLLABUS:
-{syllabus}
+{syllabus_text}
 
-QUESTION PAPER:
+QUESTION PAPER TEXT:
 {raw_text}
-"""
 
-            result = ai_service.ask_json(prompt)
-
-            if result and isinstance(
-                result.get("questions"),
-                list
-            ):
-                return QuestionExtractorService._clean_questions(
-                    result["questions"],
-                    paper_year
-                )
-
-
-        # ---------------------------------------------------------
-        # MODE 2:
-        # No syllabus → AI discovers topics from the questions
-        # ---------------------------------------------------------
-        if ai_service.enabled and not syllabus:
-
-            prompt = f"""
-Analyze this exam question paper and extract every question.
-
-There is NO syllabus available.
-
-Therefore, discover the academic topics and subtopics directly
-from the questions.
-
-Return JSON only in this format:
-
+Return:
 {{
   "questions": [
     {{
-      "id": "unique_id",
-      "question": "full question",
+      "question": "...",
       "year": {paper_year},
       "marks": 2,
-      "unit": "Unit 1",
-      "topic": "Discovered topic",
-      "subtopic": "Discovered subtopic",
-      "question_type": "Numerical",
-      "difficulty": "Easy",
-      "confidence": 0.90,
+      "unit": "...",
+      "topic": "...",
+      "subtopic": "...",
+      "question_type": "...",
+      "difficulty": "Easy/Medium/Hard",
+      "confidence": 0.0,
       "needs_review": false
     }}
   ]
 }}
-
-Rules:
-
-1. Extract ONLY questions that actually appear in the paper.
-2. Do NOT invent questions.
-3. Do NOT invent an official syllabus.
-4. Topics must be discovered from the actual question content.
-5. Use meaningful academic topic names.
-6. Group questions dealing with the same concept under the
-   same topic/subtopic whenever appropriate.
-7. If the paper clearly contains unit information, preserve it.
-8. If unit information is not available, use:
-   "Unit 1", "Unit 2", etc. only when supported by the paper.
-9. If the unit cannot be determined, use:
-   "Unknown Unit"
-10. Do not assume that the subject is DSA.
-11. The subject must be inferred from the actual question content.
-12. If confidence is low, set needs_review to true.
-13. question_type should describe the actual type of question.
-14. difficulty should be Easy, Medium, or Hard.
-15. Return valid JSON only.
-
-QUESTION PAPER:
-{raw_text}
 """
 
             result = ai_service.ask_json(prompt)
 
-            if result and isinstance(
-                result.get("questions"),
-                list
-            ):
+            if result and isinstance(result.get("questions"), list):
                 return QuestionExtractorService._clean_questions(
                     result["questions"],
                     paper_year
                 )
 
-
-        # ---------------------------------------------------------
-        # MODE 3:
-        # No AI → fallback heuristic extraction
-        # ---------------------------------------------------------
+        # Local fallback
         return QuestionExtractorService._heuristic(
             raw_text,
-            paper_year,
-            syllabus or {}
+            paper_year
         )
-
-
-    # =============================================================
-    # CLEAN AI RESULTS
-    # =============================================================
 
     @staticmethod
     def _clean_questions(
         questions: List[Dict[str, Any]],
-        paper_year: int
+        year: int
     ) -> List[Dict[str, Any]]:
 
         cleaned = []
 
-        for question in questions:
+        for q in questions:
+            question = str(q.get("question", "")).strip()
 
-            if not isinstance(question, dict):
+            if not QuestionExtractorService._looks_like_question(question):
                 continue
 
-            text = str(
-                question.get("question", "")
-            ).strip()
-
-            if len(text) <= 8:
-                continue
-
-
-            # Make sure every question has an ID
-            question_id = question.get("id")
-
-            if not question_id:
-                question_id = (
-                    f"extracted_"
-                    f"{uuid.uuid4().hex[:8]}"
-                )
-
-
-            # Marks
             try:
-                marks = int(
-                    question.get(
-                        "marks",
-                        2
-                    )
-                )
-            except (TypeError, ValueError):
+                marks = int(q.get("marks", 2))
+            except Exception:
                 marks = 2
 
-
-            # Difficulty
-            difficulty = str(
-                question.get(
-                    "difficulty",
-                    "Medium"
-                )
-            ).strip()
-
-            if difficulty not in [
-                "Easy",
-                "Medium",
-                "Hard"
-            ]:
-                difficulty = "Medium"
-
-
-            # Confidence
-            try:
-                confidence = float(
-                    question.get(
-                        "confidence",
-                        0.7
-                    )
-                )
-            except (TypeError, ValueError):
-                confidence = 0.7
-
-            confidence = max(
-                0.0,
-                min(1.0, confidence)
-            )
-
-
-            # Topic information
-            unit = str(
-                question.get(
-                    "unit",
-                    "Unknown Unit"
-                )
-            ).strip()
-
-            topic = str(
-                question.get(
-                    "topic",
-                    "Unknown Topic"
-                )
-            ).strip()
-
-            subtopic = str(
-                question.get(
-                    "subtopic",
-                    "Unassigned"
-                )
-            ).strip()
-
-
-            question_type = str(
-                question.get(
-                    "question_type",
-                    "Explanation"
-                )
-            ).strip()
-
-
-            needs_review = bool(
-                question.get(
-                    "needs_review",
-                    confidence < 0.6
-                )
-            )
-
+            if marks <= 0 or marks > 20:
+                marks = 2
 
             cleaned.append({
-
-                "id": question_id,
-
-                "question": text,
-
-                "year": question.get(
-                    "year",
-                    paper_year
+                "id": q.get(
+                    "id",
+                    f"extracted_{uuid.uuid4().hex[:8]}"
                 ),
-
+                "question": question,
+                "year": q.get("year", year),
                 "marks": marks,
-
-                "unit": unit,
-
-                "topic": topic,
-
-                "subtopic": subtopic,
-
-                "question_type": question_type,
-
-                "difficulty": difficulty,
-
-                "confidence": confidence,
-
-                "needs_review": needs_review
+                "unit": q.get("unit", "Needs Review"),
+                "topic": q.get("topic", "Needs Review"),
+                "subtopic": q.get("subtopic", "Unassigned"),
+                "question_type": q.get(
+                    "question_type",
+                    "Explanation"
+                ),
+                "difficulty": q.get(
+                    "difficulty",
+                    "Medium"
+                ),
+                "confidence": float(
+                    q.get("confidence", 0.6)
+                ),
+                "needs_review": bool(
+                    q.get("needs_review", False)
+                )
             })
-
 
         return cleaned
 
-
-    # =============================================================
-    # HEURISTIC EXTRACTION
-    # =============================================================
-
     @staticmethod
     def _heuristic(
-        raw_text,
-        year,
-        syllabus
-    ):
+        raw_text: str,
+        year: int
+    ) -> List[Dict[str, Any]]:
 
-        lines = [
-            re.sub(
-                r"\s+",
-                " ",
-                x.strip()
-            )
-            for x in raw_text.splitlines()
-            if x.strip()
-        ]
+        # Clean OCR noise
+        text = raw_text.replace("\x00", " ")
+        text = re.sub(r"\s+", " ", text)
 
-
-        questions = []
-        buf = []
-        current_marks = 2
-
-
-        q_start = re.compile(
-            r"^(?:"
-            r"Q(?:uestion)?\s*\d+"
-            r"|\d+\s*[.)]"
-            r"|[A-Z]\d+\s*[.)]"
-            r")",
-            re.I
+        # Split into possible question blocks.
+        # Supports:
+        # 1.
+        # 1)
+        # Q1
+        # Q.1
+        # Question 1
+        pattern = re.compile(
+            r"(?=(?:Question\s*)?(?:Q\.?\s*)?\d+\s*[\.)\:])",
+            re.IGNORECASE
         )
 
+        blocks = pattern.split(text)
 
-        for line in lines:
+        questions = []
 
-            mm = re.search(
-                r"(?:\(|\[)?\s*"
-                r"(\d+)"
-                r"\s*(?:marks?|M)"
-                r"\s*(?:\)|\])?",
-                line,
-                re.I
+        for block in blocks:
+            block = block.strip()
+
+            if len(block) < 15:
+                continue
+
+            # Remove obvious page / lecture-note material
+            if QuestionExtractorService._is_non_exam_content(block):
+                continue
+
+            # Must look like an actual question
+            if not QuestionExtractorService._looks_like_question(block):
+                continue
+
+            marks = QuestionExtractorService._detect_marks(block)
+
+            structured = QuestionExtractorService._structure(
+                block,
+                year,
+                marks
             )
 
+            questions.append(structured)
 
-            if mm:
-                current_marks = int(
-                    mm.group(1)
-                )
-
-
-            if q_start.match(line):
-
-                if buf:
-
-                    questions.append(
-                        QuestionExtractorService._structure(
-                            " ".join(buf),
-                            year,
-                            current_marks,
-                            syllabus
-                        )
-                    )
-
-                buf = [line]
-
-            elif buf:
-
-                buf.append(line)
-
-
-        if buf:
-
-            questions.append(
-                QuestionExtractorService._structure(
-                    " ".join(buf),
-                    year,
-                    current_marks,
-                    syllabus
-                )
-            )
-
-
-        return [
-            q
-            for q in questions
-            if len(q["question"]) > 8
-        ]
-
-
-    # =============================================================
-    # STRUCTURE INDIVIDUAL QUESTION
-    # =============================================================
+        return questions
 
     @staticmethod
-    def _structure(
-        text,
-        year,
-        marks,
-        syllabus
-    ):
+    def _detect_marks(text: str) -> int:
+
+        # Look for explicit marks near the end of the question
+        patterns = [
+            r"\(\s*(\d+)\s*marks?\s*\)",
+            r"\[\s*(\d+)\s*marks?\s*\]",
+            r"(\d+)\s*marks?\s*$",
+            r"[-–]\s*(\d+)\s*$"
+        ]
+
+        for pattern in patterns:
+            match = re.search(
+                pattern,
+                text,
+                re.IGNORECASE
+            )
+
+            if match:
+                marks = int(match.group(1))
+
+                if 1 <= marks <= 20:
+                    return marks
+
+        # Safe default
+        return 2
+
+    @staticmethod
+    def _looks_like_question(text: str) -> bool:
+
+        low = text.lower().strip()
+
+        # Reject obvious lecture/study material
+        bad_phrases = [
+            "lecture -",
+            "lecture –",
+            "lecture:",
+            "quick memory trick",
+            "example:",
+            "example ",
+            "solution:",
+            "solution ",
+            "consistency check:",
+            "conclusion:",
+            "statement name of the law",
+            "chapter ",
+            "contents",
+            "references",
+            "bibliography"
+        ]
+
+        if any(x in low for x in bad_phrases):
+            return False
+
+        # Strong question indicators
+        question_words = [
+            "which",
+            "what",
+            "find",
+            "determine",
+            "prove",
+            "show",
+            "state",
+            "define",
+            "construct",
+            "calculate",
+            "solve",
+            "verify",
+            "express",
+            "rewrite",
+            "translate",
+            "establish",
+            "derive",
+            "explain",
+            "compare",
+            "differentiate"
+        ]
+
+        if any(
+            re.search(r"\b" + re.escape(word) + r"\b", low)
+            for word in question_words
+        ):
+            return True
+
+        # Mathematical notation often survives OCR
+        math_indicators = [
+            "proposition",
+            "truth table",
+            "tautology",
+            "contradiction",
+            "predicate",
+            "quantifier",
+            "relation",
+            "function",
+            "permutation",
+            "combination",
+            "graph",
+            "recurrence",
+            "set",
+            "subset"
+        ]
+
+        return any(x in low for x in math_indicators)
+
+    @staticmethod
+    def _is_non_exam_content(text: str) -> bool:
 
         low = text.lower()
 
+        # These are strong indicators that the PDF is lecture material
+        lecture_indicators = [
+            "lecture -",
+            "lecture –",
+            "quick memory trick",
+            "example 1:",
+            "example 2:",
+            "example:",
+            "solution:",
+            "consistency check:",
+            "conclusion:",
+            "statement name of the law",
+            "logical equivalences and examples",
+            "compound propositions"
+        ]
+
+        matches = sum(
+            1 for x in lecture_indicators
+            if x in low
+        )
+
+        # If several lecture indicators occur,
+        # don't treat the block as an exam question.
+        return matches >= 2
+
+    @staticmethod
+    def _structure(
+        text: str,
+        year: int,
+        marks: int
+    ) -> Dict[str, Any]:
+
+        low = text.lower()
 
         # ---------------------------------------------------------
-        # Question type
+        # MATHEMATICS — LOGIC
         # ---------------------------------------------------------
 
-        if any(
-            x in low
-            for x in [
-                "differentiate",
-                "compare",
-                " vs ",
-                "difference between"
-            ]
-        ):
+        if any(x in low for x in [
+            "proposition",
+            "truth table",
+            "tautology",
+            "contradiction",
+            "logical equivalence",
+            "logical connective",
+            "biconditional",
+            "conditional statement",
+            "converse",
+            "contrapositive",
+            "inverse"
+        ]):
 
-            typ = "Comparison"
+            topic = "Logic and Propositions"
 
+            if any(x in low for x in [
+                "quantifier",
+                "predicate",
+                "domain",
+                "∀",
+                "∃",
+                "nested quantification",
+                "negation"
+            ]):
+                topic = "Predicates and Quantifiers"
+                subtopic = "Predicates, Quantifiers and Negation"
 
-        elif any(
-            x in low
-            for x in [
-                "algorithm",
-                "bfs",
-                "dfs",
-                "dijkstra",
-                "kruskal",
-                "prim"
-            ]
-        ):
+            elif any(x in low for x in [
+                "truth table",
+                "tautology",
+                "logical equivalence"
+            ]):
+                subtopic = "Truth Tables and Logical Equivalence"
 
-            typ = "Algorithm"
+            elif any(x in low for x in [
+                "converse",
+                "contrapositive",
+                "inverse",
+                "conditional"
+            ]):
+                subtopic = "Conditional and Biconditional Statements"
 
+            else:
+                subtopic = "Propositions and Logical Connectives"
 
-        elif any(
-            x in low
-            for x in [
-                "trace",
-                "calculate",
-                "construct",
-                "convert",
-                "find",
-                "solve",
-                "evaluate"
-            ]
-        ):
+            unit = "Unit 1"
 
-            typ = "Numerical"
+        # ---------------------------------------------------------
+        # SET THEORY
+        # ---------------------------------------------------------
 
+        elif any(x in low for x in [
+            "set",
+            "subset",
+            "union",
+            "intersection",
+            "cartesian product",
+            "power set",
+            "venn diagram"
+        ]):
 
-        elif any(
-            x in low
-            for x in [
-                "write a",
-                "write c",
-                "write a c",
-                "function",
-                "program"
-            ]
-        ):
+            unit = "Unit 1"
+            topic = "Set Theory"
+            subtopic = "Sets and Set Operations"
 
-            typ = "Programming"
+        # ---------------------------------------------------------
+        # RELATIONS
+        # ---------------------------------------------------------
 
+        elif any(x in low for x in [
+            "relation",
+            "equivalence relation",
+            "reflexive",
+            "symmetric",
+            "transitive",
+            "antisymmetric"
+        ]):
 
-        elif any(
-            x in low
-            for x in [
-                "define",
-                "what is",
-                "state"
-            ]
-        ):
+            unit = "Unit 2"
+            topic = "Relations"
+            subtopic = "Properties of Relations"
 
-            typ = "Definition"
+        # ---------------------------------------------------------
+        # FUNCTIONS
+        # ---------------------------------------------------------
 
+        elif any(x in low for x in [
+            "function",
+            "injective",
+            "surjective",
+            "bijective",
+            "one-to-one",
+            "onto"
+        ]):
 
-        elif any(
-            x in low
-            for x in [
-                "derive",
-                "prove",
-                "show that"
-            ]
-        ):
+            unit = "Unit 2"
+            topic = "Functions"
+            subtopic = "Types of Functions"
 
-            typ = "Derivation"
+        # ---------------------------------------------------------
+        # COMBINATORICS
+        # ---------------------------------------------------------
 
+        elif any(x in low for x in [
+            "permutation",
+            "combination",
+            "binomial coefficient",
+            "counting principle",
+            "pigeonhole"
+        ]):
 
-        elif "diagram" in low:
+            unit = "Unit 3"
+            topic = "Combinatorics"
+            subtopic = "Permutations, Combinations and Counting"
 
-            typ = "Diagram"
+        # ---------------------------------------------------------
+        # GRAPH THEORY
+        # ---------------------------------------------------------
 
+        elif any(x in low for x in [
+            "graph",
+            "vertex",
+            "vertices",
+            "edge",
+            "degree",
+            "euler",
+            "hamilton",
+            "connected graph"
+        ]):
+
+            unit = "Unit 4"
+            topic = "Graph Theory"
+            subtopic = "Graphs and Graph Properties"
+
+        # ---------------------------------------------------------
+        # RECURRENCE
+        # ---------------------------------------------------------
+
+        elif any(x in low for x in [
+            "recurrence",
+            "recurrence relation"
+        ]):
+
+            unit = "Unit 5"
+            topic = "Recurrence Relations"
+            subtopic = "Solving Recurrence Relations"
 
         else:
-
-            typ = "Explanation"
-
-
-        # ---------------------------------------------------------
-        # Topic mapping
-        # ---------------------------------------------------------
-
-        if syllabus:
-
-            mapped = (
-                syllabus_mapper_service
-                .map_question(
-                    text,
-                    syllabus
-                )
-            )
-
-        else:
-
-            mapped = {
-                "unit": "Unknown Unit",
-                "topic": "Unknown Topic",
-                "subtopic": "Unassigned",
-                "confidence": 0.3,
-                "needs_review": True
-            }
-
+            unit = "Needs Review"
+            topic = "Needs Review"
+            subtopic = "Unassigned"
 
         # ---------------------------------------------------------
-        # Difficulty
+        # DIFFICULTY
         # ---------------------------------------------------------
 
         if marks <= 2:
-
             difficulty = "Easy"
-
         elif marks <= 10:
-
             difficulty = "Medium"
-
         else:
-
             difficulty = "Hard"
 
+        # ---------------------------------------------------------
+        # QUESTION TYPE
+        # ---------------------------------------------------------
+
+        if any(x in low for x in [
+            "define",
+            "what is",
+            "state"
+        ]):
+            question_type = "Definition"
+
+        elif any(x in low for x in [
+            "prove",
+            "show that",
+            "verify",
+            "disprove",
+            "counterexample"
+        ]):
+            question_type = "Proof"
+
+        elif any(x in low for x in [
+            "derive",
+            "derivation"
+        ]):
+            question_type = "Derivation"
+
+        elif any(x in low for x in [
+            "calculate",
+            "determine",
+            "solve",
+            "find"
+        ]):
+            question_type = "Numerical"
+
+        elif any(x in low for x in [
+            "compare",
+            "differentiate",
+            "difference between"
+        ]):
+            question_type = "Comparison"
+
+        else:
+            question_type = "Explanation"
+
+        needs_review = topic == "Needs Review"
 
         return {
-
-            "id":
-                f"extracted_"
-                f"{uuid.uuid4().hex[:8]}",
-
-            "question":
-                text,
-
-            "year":
-                year,
-
-            "marks":
-                marks,
-
-            "unit":
-                mapped["unit"],
-
-            "topic":
-                mapped["topic"],
-
-            "subtopic":
-                mapped["subtopic"],
-
-            "question_type":
-                typ,
-
-            "difficulty":
-                difficulty,
-
-            "confidence":
-                mapped["confidence"],
-
-            "needs_review":
-                mapped["needs_review"]
+            "id": f"extracted_{uuid.uuid4().hex[:8]}",
+            "question": text,
+            "year": year,
+            "marks": marks,
+            "unit": unit,
+            "topic": topic,
+            "subtopic": subtopic,
+            "question_type": question_type,
+            "difficulty": difficulty,
+            "confidence": 0.85 if not needs_review else 0.3,
+            "needs_review": needs_review
         }
 
 
-question_extractor_service = (
-    QuestionExtractorService()
-)
+question_extractor_service = QuestionExtractorService()

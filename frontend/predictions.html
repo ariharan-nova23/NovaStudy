@@ -37,21 +37,21 @@
   </aside>
 
   <main class="app-main">
+
     <header class="app-header">
       <div class="header-title-box">
         <h1>AI Priority Scores & Exam Pattern Predictions</h1>
       </div>
+
       <div class="subject-selector-wrap">
         <select id="globalSubjectSelect">
-          <option value="dsa">Data Structures & Algorithms</option>
-          <option value="os">Operating Systems</option>
+          <!-- Subjects loaded automatically from backend -->
         </select>
       </div>
     </header>
 
     <div class="content-container">
-      
-      <!-- Disclaimer Banner -->
+
       <div style="padding: 1rem 1.25rem; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; margin-bottom: 2rem; font-size: 0.85rem; color: #c7d2fe;">
         <strong>📌 AI Prediction Disclaimer:</strong>
         <span id="predictionsDisclaimer">
@@ -59,17 +59,19 @@
         </span>
       </div>
 
-      <!-- High Priority Topics -->
-      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">🔥 Most Important Exam Topics</h2>
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">
+        🔥 Most Important Exam Topics
+      </h2>
+
       <div class="grid-3" id="importantTopicsGrid" style="margin-bottom: 2rem;">
-        <!-- Rendered via predictions.js -->
       </div>
 
-      <!-- Likely Question Types -->
       <div class="card" style="margin-bottom: 2rem;">
-        <h3 class="card-title" style="margin-bottom: 1rem;">🎯 Likely Question Types Probability</h3>
+        <h3 class="card-title" style="margin-bottom: 1rem;">
+          🎯 Likely Question Types Probability
+        </h3>
+
         <div id="likelyTypesContainer">
-          <!-- Rendered via predictions.js -->
         </div>
       </div>
 
@@ -77,6 +79,39 @@
   </main>
 
   <script src="js/api.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const select = document.getElementById("globalSubjectSelect");
+
+      try {
+        const response = await fetch("/api/subjects");
+        const subjects = await response.json();
+
+        select.innerHTML = "";
+
+        subjects.forEach(subject => {
+          const option = document.createElement("option");
+          option.value = subject.id;
+          option.textContent = subject.name;
+          select.appendChild(option);
+        });
+
+        const savedSubject = localStorage.getItem("smart_exam_subject");
+
+        if (savedSubject && subjects.some(s => s.id === savedSubject)) {
+          select.value = savedSubject;
+        }
+
+        select.dispatchEvent(new Event("change"));
+
+      } catch (error) {
+        console.error("Failed to load subjects:", error);
+      }
+    });
+  </script>
+
   <script src="js/predictions.js"></script>
+
 </body>
 </html>
