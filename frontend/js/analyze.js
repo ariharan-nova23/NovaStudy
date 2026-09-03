@@ -1,44 +1,69 @@
 document.addEventListener("DOMContentLoaded", async () => {
+
   // Load subjects into the existing subject dropdown first
   await loadSubjects();
 
   const subjectId = getSelectedSubject();
 
+
   // Keep the dropdown synchronized with the selected subject
-  const sel = document.getElementById("globalSubjectSelect");
+  const sel =
+    document.getElementById("globalSubjectSelect");
+
 
   if (sel) {
+
     if (subjectId) {
       sel.value = subjectId;
     }
 
+
     sel.addEventListener("change", async (e) => {
-      const newSubjectId = e.target.value;
+
+      const newSubjectId =
+        e.target.value;
 
       if (!newSubjectId) return;
 
       setSelectedSubject(newSubjectId);
 
-      await loadAnalysisData(newSubjectId);
+      await loadAnalysisData(
+        newSubjectId
+      );
+
     });
+
   }
+
 
   // Upload form
   const uploadForm =
-    document.getElementById("paperUploadForm");
+    document.getElementById(
+      "paperUploadForm"
+    );
+
 
   if (uploadForm) {
+
     uploadForm.addEventListener(
       "submit",
       handlePaperUpload
     );
+
   }
+
 
   // Load initial analysis
   if (subjectId) {
-    await loadAnalysisData(subjectId);
+
+    await loadAnalysisData(
+      subjectId
+    );
+
   }
+
 });
+
 
 
 /* =========================================================
@@ -46,19 +71,34 @@ document.addEventListener("DOMContentLoaded", async () => {
    ========================================================= */
 
 async function loadSubjects() {
+
   const sel =
-    document.getElementById("globalSubjectSelect");
+    document.getElementById(
+      "globalSubjectSelect"
+    );
+
 
   if (!sel) return;
 
+
   try {
+
     const subjects =
-      await APIClient.get("/api/subjects");
+      await APIClient.get(
+        "/api/subjects"
+      );
+
 
     /*
-     * APIClient.get() returns null when the request fails.
+     * APIClient.get() returns null
+     * when the request fails.
      */
-    if (!Array.isArray(subjects) || subjects.length === 0) {
+
+    if (
+      !Array.isArray(subjects) ||
+      subjects.length === 0
+    ) {
+
       sel.innerHTML = `
         <option value="">
           No subjects available
@@ -66,86 +106,117 @@ async function loadSubjects() {
       `;
 
       return;
+
     }
 
-    /*
-     * Build the dropdown dynamically from the backend.
-     *
-     * This means we no longer hardcode DSA/OS inside
-     * analyze.js.
-     */
-    sel.innerHTML = subjects
-      .map(subject => `
-        <option value="${escapeHtml(subject.id)}">
-          ${escapeHtml(subject.name)}
-        </option>
-      `)
-      .join("");
 
     /*
-     * Try to restore the previously selected subject.
+     * Build the dropdown dynamically
+     * from the backend.
      */
+
+    sel.innerHTML =
+      subjects
+        .map(subject => `
+          <option value="${escapeHtml(subject.id)}">
+            ${escapeHtml(subject.name)}
+          </option>
+        `)
+        .join("");
+
+
+    /*
+     * Try to restore the previously
+     * selected subject.
+     */
+
     const savedSubject =
-      localStorage.getItem("smart_exam_subject");
+      localStorage.getItem(
+        "smart_exam_subject"
+      );
+
 
     const savedExists =
       subjects.some(
-        subject => subject.id === savedSubject
+        subject =>
+          subject.id === savedSubject
       );
 
+
     if (savedExists) {
-      sel.value = savedSubject;
+
+      sel.value =
+        savedSubject;
+
     } else {
+
       /*
-       * If no saved subject exists, use the first subject
-       * supplied by the backend.
+       * If no saved subject exists,
+       * use the first subject.
        */
-      sel.value = subjects[0].id;
+
+      sel.value =
+        subjects[0].id;
+
 
       setSelectedSubject(
         subjects[0].id
       );
+
     }
 
   } catch (error) {
+
     console.error(
       "Failed to load subjects:",
       error
     );
+
 
     sel.innerHTML = `
       <option value="">
         Unable to load subjects
       </option>
     `;
+
   }
+
 }
+
 
 
 /* =========================================================
    LOAD ANALYSIS DATA
    ========================================================= */
 
-async function loadAnalysisData(subjectId) {
+async function loadAnalysisData(
+  subjectId
+) {
 
   if (!subjectId) {
+
     console.warn(
       "loadAnalysisData called without subjectId"
     );
 
     return;
+
   }
+
 
   try {
 
     /*
-     * Load all three analysis resources together.
+     * Load all three analysis resources
+     * together.
      */
+
     const [
       patterns,
       repeated,
       questionsData
     ] = await Promise.all([
+
       APIClient.get(
         `/api/analysis/patterns/${subjectId}`
       ),
@@ -157,25 +228,34 @@ async function loadAnalysisData(subjectId) {
       APIClient.get(
         `/api/analysis/questions/${subjectId}`
       )
+
     ]);
 
 
     if (patterns) {
-      renderPatternCharts(patterns);
+
+      renderPatternCharts(
+        patterns
+      );
+
     }
 
 
     if (repeated) {
+
       renderRepeatedQuestionsTable(
         repeated.repeated_groups || []
       );
+
     }
 
 
     if (questionsData) {
+
       renderExtractedQuestions(
         questionsData.questions || []
       );
+
     }
 
   } catch (error) {
@@ -184,12 +264,15 @@ async function loadAnalysisData(subjectId) {
       "Failed to load analysis data:",
       error
     );
+
   }
+
 }
 
 
+
 /* =========================================================
-   PAPER UPLOAD
+   PAPER / STUDY MATERIAL UPLOAD
    ========================================================= */
 
 async function handlePaperUpload(e) {
@@ -197,15 +280,27 @@ async function handlePaperUpload(e) {
   e.preventDefault();
 
 
+  // -----------------------------------------
+  // Get form elements
+  // -----------------------------------------
+
   const fileInput =
     document.getElementById(
       "paperFileInput"
     );
 
+
   const yearInput =
     document.getElementById(
       "paperYearInput"
     );
+
+
+  const uploadTypeInput =
+    document.getElementById(
+      "uploadType"
+    );
+
 
   const statusEl =
     document.getElementById(
@@ -213,9 +308,10 @@ async function handlePaperUpload(e) {
     );
 
 
-  /*
-   * Validate file.
-   */
+  // -----------------------------------------
+  // Validate file
+  // -----------------------------------------
+
   if (
     !fileInput ||
     !fileInput.files ||
@@ -223,17 +319,18 @@ async function handlePaperUpload(e) {
   ) {
 
     alert(
-      "Please select a question paper PDF or image file."
+      "Please select a PDF or image file."
     );
 
     return;
+
   }
 
 
-  /*
-   * IMPORTANT:
-   * Always use the currently selected subject.
-   */
+  // -----------------------------------------
+  // Get selected subject
+  // -----------------------------------------
+
   const subjectId =
     getSelectedSubject();
 
@@ -245,44 +342,79 @@ async function handlePaperUpload(e) {
     );
 
     return;
+
   }
 
 
-  /*
-   * Show processing status.
-   */
+  // -----------------------------------------
+  // Get upload type
+  // -----------------------------------------
+
+  const uploadType =
+    uploadTypeInput
+      ? uploadTypeInput.value
+      : "question_paper";
+
+
+  // -----------------------------------------
+  // Show processing status
+  // -----------------------------------------
+
   if (statusEl) {
 
-    statusEl.style.display = "block";
+    statusEl.style.display =
+      "block";
 
-    statusEl.innerHTML = `
-      <span style="color: var(--accent-cyan);">
-        ⏳ Processing document & running
-        question extraction engine...
-      </span>
-    `;
+
+    if (
+      uploadType ===
+      "study_material"
+    ) {
+
+      statusEl.innerHTML = `
+        <span style="color: var(--accent-cyan);">
+          ⏳ Processing study material
+          & extracting useful questions/topics...
+        </span>
+      `;
+
+    } else {
+
+      statusEl.innerHTML = `
+        <span style="color: var(--accent-cyan);">
+          ⏳ Processing previous question paper
+          & running question extraction engine...
+        </span>
+      `;
+
+    }
+
   }
 
 
-  /*
-   * Build multipart form data.
-   */
+  // -----------------------------------------
+  // Build multipart form data
+  // -----------------------------------------
+
   const formData =
     new FormData();
 
 
+  // File
   formData.append(
     "file",
     fileInput.files[0]
   );
 
 
+  // Subject
   formData.append(
     "subject_id",
     subjectId
   );
 
 
+  // Year
   formData.append(
     "year",
     yearInput && yearInput.value
@@ -290,6 +422,17 @@ async function handlePaperUpload(e) {
       : new Date().getFullYear()
   );
 
+
+  // ⭐ Upload type
+  formData.append(
+    "upload_type",
+    uploadType
+  );
+
+
+  // -----------------------------------------
+  // Send to backend
+  // -----------------------------------------
 
   try {
 
@@ -301,14 +444,15 @@ async function handlePaperUpload(e) {
 
 
     console.log(
-      "Paper upload response:",
+      "Document upload response:",
       res
     );
 
 
-    /*
-     * SUCCESS
-     */
+    // -----------------------------------------
+    // SUCCESS
+    // -----------------------------------------
+
     if (
       res &&
       res.status === "success"
@@ -316,64 +460,74 @@ async function handlePaperUpload(e) {
 
       if (statusEl) {
 
+        const typeMessage =
+          uploadType ===
+          "study_material"
+            ? "study material"
+            : "previous question paper";
+
+
         statusEl.innerHTML = `
           <span style="color: var(--accent-emerald);">
-            ✓ Successfully extracted
+            ✓ Successfully processed
             ${res.extracted_questions_count || 0}
-            structured questions
-            ${
-              res.title
-                ? `from ${escapeHtml(res.title)}`
-                : ""
-            }!
+            questions from
+            ${typeMessage}!
           </span>
         `;
+
       }
 
 
       /*
-       * Refresh the analysis using the SAME
-       * subject that was used during upload.
+       * Refresh the analysis using
+       * the same subject.
        */
+
       await loadAnalysisData(
         subjectId
       );
 
 
       /*
-       * Clear the selected file so the user knows
-       * the upload completed.
+       * Clear selected file.
        */
+
       fileInput.value = "";
 
     }
 
-    /*
-     * Unexpected response
-     */
+
+    // -----------------------------------------
+    // UNEXPECTED RESPONSE
+    // -----------------------------------------
+
     else {
 
       if (statusEl) {
 
         statusEl.innerHTML = `
           <span style="color: var(--accent-rose);">
-            ❌ Failed to process paper.
-            Please check the file format and
-            selected subject.
+            ❌ Failed to process document.
+            Please check the file format
+            and selected subject.
           </span>
         `;
+
       }
+
 
       console.error(
         "Unexpected upload response:",
         res
       );
+
     }
 
   } catch (error) {
 
     console.error(
-      "Paper upload failed:",
+      "Document upload failed:",
       error
     );
 
@@ -384,20 +538,26 @@ async function handlePaperUpload(e) {
         <span style="color: var(--accent-rose);">
           ❌ ${
             error.message ||
-            "Failed to process paper."
+            "Failed to process document."
           }
         </span>
       `;
+
     }
+
   }
+
 }
+
 
 
 /* =========================================================
    PATTERN CHARTS
    ========================================================= */
 
-function renderPatternCharts(patterns) {
+function renderPatternCharts(
+  patterns
+) {
 
   if (!patterns) return;
 
@@ -418,18 +578,22 @@ function renderPatternCharts(patterns) {
   ) {
 
     if (window.myUnitChart) {
+
       window.myUnitChart.destroy();
+
     }
 
 
     const unitDistribution =
-      patterns.unit_distribution || {};
+      patterns.unit_distribution ||
+      {};
 
 
     window.myUnitChart =
       new Chart(
         unitCtx,
         {
+
           type: "bar",
 
           data: {
@@ -441,6 +605,7 @@ function renderPatternCharts(patterns) {
 
             datasets: [
               {
+
                 label:
                   "Unit Distribution (%)",
 
@@ -458,53 +623,67 @@ function renderPatternCharts(patterns) {
                 ],
 
                 borderRadius: 8
+
               }
+
             ]
+
           },
+
 
           options: {
 
             responsive: true,
+
 
             plugins: {
 
               legend: {
                 display: false
               }
+
             },
+
 
             scales: {
 
               x: {
 
                 ticks: {
-                  color:
-                    "#94a3b8"
+                  color: "#94a3b8"
                 },
 
                 grid: {
                   color:
                     "rgba(255,255,255,0.05)"
                 }
+
               },
+
 
               y: {
 
                 ticks: {
-                  color:
-                    "#94a3b8"
+                  color: "#94a3b8"
                 },
 
                 grid: {
                   color:
                     "rgba(255,255,255,0.05)"
                 }
+
               }
+
             }
+
           }
+
         }
+
       );
+
   }
+
 
 
   /* =======================================================
@@ -523,18 +702,22 @@ function renderPatternCharts(patterns) {
   ) {
 
     if (window.myTypeChart) {
+
       window.myTypeChart.destroy();
+
     }
 
 
     const typeDistribution =
-      patterns.question_type_distribution || {};
+      patterns.question_type_distribution ||
+      {};
 
 
     window.myTypeChart =
       new Chart(
         typeCtx,
         {
+
           type: "doughnut",
 
           data: {
@@ -560,13 +743,18 @@ function renderPatternCharts(patterns) {
                   "#ec4899",
                   "#8b5cf6"
                 ]
+
               }
+
             ]
+
           },
+
 
           options: {
 
             responsive: true,
+
 
             plugins: {
 
@@ -575,16 +763,23 @@ function renderPatternCharts(patterns) {
                 position: "right",
 
                 labels: {
-                  color:
-                    "#94a3b8"
+                  color: "#94a3b8"
                 }
+
               }
+
             }
+
           }
+
         }
+
       );
+
   }
+
 }
+
 
 
 /* =========================================================
@@ -611,6 +806,7 @@ function renderRepeatedQuestionsTable(
 
     tableBody.innerHTML = `
       <tr>
+
         <td
           colspan="5"
           style="
@@ -621,10 +817,12 @@ function renderRepeatedQuestionsTable(
         >
           No repeated questions found yet.
         </td>
+
       </tr>
     `;
 
     return;
+
   }
 
 
@@ -641,7 +839,8 @@ function renderRepeatedQuestionsTable(
 
 
         const priority =
-          g.priority || "Normal";
+          g.priority ||
+          "Normal";
 
 
         let priorityClass =
@@ -656,10 +855,12 @@ function renderRepeatedQuestionsTable(
 
           priorityClass =
             "badge-critical";
+
         }
 
 
         return `
+
           <tr>
 
             <td>
@@ -676,6 +877,7 @@ function renderRepeatedQuestionsTable(
                 )}
               </strong>
 
+
               <div
                 style="
                   font-size:0.8rem;
@@ -683,13 +885,19 @@ function renderRepeatedQuestionsTable(
                   margin-top:0.2rem;
                 "
               >
+
                 ${escapeHtml(
-                  g.unit || ""
+                  g.unit ||
+                  ""
                 )}
+
                 •
+
                 ${escapeHtml(
-                  g.topic || ""
+                  g.topic ||
+                  ""
                 )}
+
               </div>
 
             </td>
@@ -700,16 +908,20 @@ function renderRepeatedQuestionsTable(
               ${years
                 .map(
                   year => `
+
                     <span
                       class="badge badge-medium"
                       style="
                         margin-right:4px;
                       "
                     >
+
                       ${escapeHtml(
                         String(year)
                       )}
+
                     </span>
+
                   `
                 )
                 .join("")}
@@ -724,9 +936,11 @@ function renderRepeatedQuestionsTable(
                   color:var(--accent-amber);
                 "
               >
+
                 ${g.frequency || 0}/
                 ${g.total_papers || 0}
                 Papers
+
               </strong>
 
               (${g.total_marks || 0}
@@ -743,9 +957,12 @@ function renderRepeatedQuestionsTable(
                   font-weight:600;
                 "
               >
+
                 ${escapeHtml(
-                  g.trend || "—"
+                  g.trend ||
+                  "—"
                 )}
+
               </span>
 
             </td>
@@ -756,18 +973,24 @@ function renderRepeatedQuestionsTable(
               <span
                 class="badge ${priorityClass}"
               >
+
                 ${escapeHtml(
                   priority
                 )}
+
               </span>
 
             </td>
 
           </tr>
+
         `;
+
       })
       .join("");
+
 }
+
 
 
 /* =========================================================
@@ -805,6 +1028,7 @@ function renderExtractedQuestions(
     `;
 
     return;
+
   }
 
 
@@ -814,22 +1038,29 @@ function renderExtractedQuestions(
         (q, idx) => {
 
           const year =
-            q.year || "—";
+            q.year ||
+            "—";
+
 
           const marks =
-            q.marks || "—";
+            q.marks ||
+            "—";
+
 
           const unit =
             q.unit ||
             "Unknown Unit";
 
+
           const topic =
             q.topic ||
             "Unknown Topic";
 
+
           const subtopic =
             q.subtopic ||
             "Unknown Subtopic";
+
 
           const questionType =
             q.question_type ||
@@ -869,15 +1100,21 @@ function renderExtractedQuestions(
                       var(--accent-cyan);
                   "
                 >
+
                   Q${idx + 1}
+
                   (${escapeHtml(
                     String(year)
                   )})
+
                   •
+
                   ${escapeHtml(
                     String(marks)
                   )}
+
                   Marks
+
                 </span>
 
 
@@ -889,18 +1126,22 @@ function renderExtractedQuestions(
                       margin-right:4px;
                     "
                   >
+
                     ${escapeHtml(
                       unit
                     )}
+
                   </span>
 
 
                   <span
                     class="badge badge-low"
                   >
+
                     ${escapeHtml(
                       questionType
                     )}
+
                   </span>
 
 
@@ -931,9 +1172,12 @@ function renderExtractedQuestions(
                   color:var(--text-main);
                 "
               >
+
                 ${escapeHtml(
-                  q.question || ""
+                  q.question ||
+                  ""
                 )}
+
               </div>
 
 
@@ -944,52 +1188,68 @@ function renderExtractedQuestions(
                   margin-top:0.4rem;
                 "
               >
+
                 Topic:
+
                 ${escapeHtml(
                   topic
                 )}
+
                 ›
+
                 ${escapeHtml(
                   subtopic
                 )}
+
               </div>
 
             </div>
 
           `;
+
         }
       )
       .join("");
+
 }
+
 
 
 /* =========================================================
    HTML ESCAPING
    ========================================================= */
 
-function escapeHtml(value) {
+function escapeHtml(
+  value
+) {
 
   return String(
     value ?? ""
   )
+
     .replace(
       /&/g,
       "&amp;"
     )
+
     .replace(
       /</g,
       "&lt;"
     )
+
     .replace(
       />/g,
       "&gt;"
     )
+
     .replace(
       /"/g,
       "&quot;"
     )
+
     .replace(
       /'/g,
       "&#039;"
     );
+
 }
