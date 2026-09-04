@@ -1,5 +1,4 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
-
 from typing import Optional
 
 from backend.services.pdf_parser import pdf_parser_service
@@ -23,133 +22,54 @@ async def upload_question_paper(
     upload_type: str = Form("question_paper")
 ):
 
-    # -------------------------------------------------
-    # Validate upload type
-    # -------------------------------------------------
-
-    if upload_type not in [
-        "question_paper",
-        "study_material"
-    ]:
-
+    if upload_type not in ["question_paper", "study_material"]:
         raise HTTPException(
             status_code=400,
-            detail="Invalid upload type. Use 'question_paper' or 'study_material'."
+            detail="Invalid upload type."
         )
-
-
-    # -------------------------------------------------
-    # Read uploaded file
-    # -------------------------------------------------
 
     content = await file.read()
 
-
     if not content:
-
         raise HTTPException(
             status_code=400,
             detail="Uploaded file is empty."
         )
 
-
-    # -------------------------------------------------
-    # Extract text
-    # -------------------------------------------------
-
-    filename =
-        (file.filename or "").lower()
-
+    filename = (file.filename or "").lower()
 
     if filename.endswith(".pdf"):
-
-        raw = (
-            pdf_parser_service
-            .extract_text_from_pdf(content)
-        )
-
+        raw = pdf_parser_service.extract_text_from_pdf(content)
     else:
+        raw = ocr_service.process_image(content)
 
-        raw = (
-            ocr_service
-            .process_image(content)
-        )
-
-
-    # -------------------------------------------------
-    # OCR fallback for scanned PDFs
-    # -------------------------------------------------
-
-    if (
-        not raw.strip()
-        and filename.endswith(".pdf")
-    ):
-
-        raw = (
-            ocr_service
-            .process_pdf_pages(content)
-        )
-
-
-    # -------------------------------------------------
-    # Make sure text was extracted
-    # -------------------------------------------------
+    if not raw.strip() and filename.endswith(".pdf"):
+        raw = ocr_service.process_pdf_pages(content)
 
     if not raw.strip():
-
         raise HTTPException(
             status_code=422,
-            detail=(
-                "Could not extract text. "
-                "Install OCR dependencies for scanned "
-                "documents or upload a text PDF."
-            )
+            detail="Could not extract text. Install OCR dependencies for scanned documents or upload a text PDF."
         )
 
+    syllabus = storage.get_syllabus(subject_id) or {}
 
-    # -------------------------------------------------
-    # Get syllabus
-    # -------------------------------------------------
-
-    syllabus =
-        storage.get_syllabus(subject_id) or {}
-
-
-    # -------------------------------------------------
-    # Extract questions
-    # -------------------------------------------------
-
-    qs = (
-        question_extractor_service
-        .extract_questions_from_text(
-            raw,
-            year,
-            syllabus
-        )
+    qs = question_extractor_service.extract_questions_from_text(
+        raw,
+        year,
+        syllabus
     )
 
-
     if not qs:
-
         raise HTTPException(
             status_code=422,
             detail="No questions were detected in this document."
         )
 
-
-    # -------------------------------------------------
-    # Store extracted questions
-    # -------------------------------------------------
-
     storage.add_questions(
         subject_id,
         qs
     )
-
-
-    # -------------------------------------------------
-    # Store paper/material record
-    # -------------------------------------------------
 
     title = (
         paper_title
@@ -161,7 +81,6 @@ async def upload_question_paper(
         )
     )
 
-
     paper = storage.add_paper(
         subject_id,
         year,
@@ -170,29 +89,15 @@ async def upload_question_paper(
         len(qs)
     )
 
-
-    # -------------------------------------------------
-    # Response
-    # -------------------------------------------------
-
     return {
-
         "status": "success",
-
         "upload_type": upload_type,
-
         "paper_id": paper["id"],
-
         "subject_id": subject_id,
-
         "year": year,
-
         "title": paper["title"],
-
         "extracted_questions_count": len(qs),
-
         "questions": qs
-
     }
 
 
@@ -204,63 +109,25 @@ async def upload_syllabus(
 
     content = await file.read()
 
-
     if not content:
-
         raise HTTPException(
             status_code=400,
             detail="Uploaded syllabus file is empty."
         )
 
-
-    # -------------------------------------------------
-    # Extract syllabus text
-    # -------------------------------------------------
-
-    raw = (
-        pdf_parser_service
-        .extract_text_from_pdf(content)
-    )
-
-
-    # -------------------------------------------------
-    # OCR fallback
-    # -------------------------------------------------
+    raw = pdf_parser_service.extract_text_from_pdf(content)
 
     if not raw.strip():
-
-        raw = (
-            ocr_service
-            .process_pdf_pages(content)
-        )
-
-
-    # -------------------------------------------------
-    # Make sure extraction succeeded
-    # -------------------------------------------------
+        raw = ocr_service.process_pdf_pages(content)
 
     if not raw.strip():
-
         raise HTTPException(
             status_code=422,
             detail="Could not extract syllabus text."
         )
 
-
-    # -------------------------------------------------
-    # Existing syllabus remains canonical
-    # -------------------------------------------------
-
     return {
-
         "status": "received",
-
         "subject_id": subject_id,
-
-        "message": (
-            "Syllabus text extracted. "
-            "Structured syllabus mapping should be reviewed "
-            "before replacing the stored syllabus."
-        )
-
+        "message": "Syllabus text extracted. Structured syllabus mapping should be reviewed before replacing the stored syllabus."
     }
