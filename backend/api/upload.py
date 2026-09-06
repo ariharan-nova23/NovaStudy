@@ -68,7 +68,8 @@ async def upload_question_paper(
 
     storage.add_questions(
         subject_id,
-        qs
+        qs,
+        source_type=upload_type
     )
 
     title = (
@@ -86,7 +87,8 @@ async def upload_question_paper(
         year,
         title,
         file.filename or title,
-        len(qs)
+        len(qs),
+        upload_type=upload_type
     )
 
     return {
