@@ -37,59 +37,124 @@
   </aside>
 
   <main class="app-main">
+
     <header class="app-header">
       <div class="header-title-box">
         <h1>AI Model Question Paper Generator & Validation System</h1>
       </div>
+
       <div class="subject-selector-wrap">
         <select id="globalSubjectSelect">
-          <option value="dsa">Data Structures & Algorithms</option>
-          <option value="os">Operating Systems</option>
+          <option value="">Loading subjects...</option>
         </select>
       </div>
     </header>
 
     <div class="content-container">
-      
+
       <!-- Configurator Form Card -->
       <div class="card" style="margin-bottom: 2rem;">
-        <h3 class="card-title" style="margin-bottom: 1rem;">⚙️ Paper Generation Parameters</h3>
+        <h3 class="card-title" style="margin-bottom: 1rem;">
+          ⚙️ Paper Generation Parameters
+        </h3>
 
-        <form id="modelPaperConfigForm" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+        <form
+          id="modelPaperConfigForm"
+          style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;"
+        >
+
           <div>
-            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Total Marks</label>
-            <input type="number" id="paperMarksInput" value="100" style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+            <label
+              style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;"
+            >
+              Total Marks
+            </label>
+
+            <input
+              type="number"
+              id="paperMarksInput"
+              value="100"
+              style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);"
+            >
           </div>
 
           <div>
-            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Exam Duration (Minutes)</label>
-            <input type="number" id="paperDurationInput" value="180" style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
+            <label
+              style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;"
+            >
+              Exam Duration (Minutes)
+            </label>
+
+            <input
+              type="number"
+              id="paperDurationInput"
+              value="180"
+              style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);"
+            >
           </div>
 
           <div>
-            <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;">Question Strategy / Pattern</label>
-            <select id="paperDifficultySelect" style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);">
-              <option value="Balanced">Balanced (Standard Distribution)</option>
-              <option value="High-Priority Topics">High-Priority Topics Focus</option>
-              <option value="University Pattern">University Exam Pattern</option>
-              <option value="Hard Practice">Hard Practice Mode</option>
-              <option value="Surprise Practice">Surprise Practice Mode</option>
+            <label
+              style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.4rem;"
+            >
+              Question Strategy / Pattern
+            </label>
+
+            <select
+              id="paperDifficultySelect"
+              style="width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);"
+            >
+              <option value="Balanced">
+                Balanced (Standard Distribution)
+              </option>
+
+              <option value="High-Priority Topics">
+                High-Priority Topics Focus
+              </option>
+
+              <option value="University Pattern">
+                University Exam Pattern
+              </option>
+
+              <option value="Hard Practice">
+                Hard Practice Mode
+              </option>
+
+              <option value="Surprise Practice">
+                Surprise Practice Mode
+              </option>
             </select>
           </div>
 
-          <div style="grid-column: span 3; display: flex; justify-content: flex-end; margin-top: 0.5rem;">
-            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">⚡ Generate & Validate Model Paper</button>
+          <div
+            style="grid-column: span 3; display: flex; justify-content: flex-end; margin-top: 0.5rem;"
+          >
+            <button
+              type="submit"
+              class="btn btn-primary"
+              style="padding: 0.75rem 2rem;"
+            >
+              ⚡ Generate & Validate Model Paper
+            </button>
           </div>
+
         </form>
       </div>
 
       <!-- Multi-step Validation Box -->
-      <div id="validationProgressBox" class="card" style="display: none; margin-bottom: 2rem; border-color: var(--accent-primary);">
+      <div
+        id="validationProgressBox"
+        class="card"
+        style="display: none; margin-bottom: 2rem; border-color: var(--accent-primary);"
+      >
         <!-- Animated checks via paper-generator.js -->
       </div>
 
       <!-- Generated Paper View -->
-      <div id="generatedPaperResultView" style="display: none;">
+      <div
+        id="generatedPaperResultView"
+        style="display: none;"
+      >
         <!-- Rendered model paper -->
       </div>
 
@@ -98,5 +163,71 @@
 
   <script src="js/api.js"></script>
   <script src="js/paper-generator.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+
+      const select = document.getElementById("globalSubjectSelect");
+
+      if (!select) return;
+
+      try {
+        const response = await fetch("/api/subjects");
+
+        if (!response.ok) {
+          throw new Error("Failed to load subjects");
+        }
+
+        const subjects = await response.json();
+
+        select.innerHTML = "";
+
+        const savedSubject =
+          localStorage.getItem("smart_exam_subject");
+
+        subjects.forEach(subject => {
+          const option = document.createElement("option");
+
+          option.value = subject.id;
+          option.textContent = subject.name;
+
+          select.appendChild(option);
+        });
+
+        if (
+          savedSubject &&
+          subjects.some(subject => subject.id === savedSubject)
+        ) {
+          select.value = savedSubject;
+        }
+
+        setSelectedSubject(select.value);
+
+        select.addEventListener("change", () => {
+          setSelectedSubject(select.value);
+        });
+
+      } catch (error) {
+
+        console.error(
+          "Could not load subjects:",
+          error
+        );
+
+        select.innerHTML = `
+          <option value="dsa">
+            Data Structures & Algorithms
+          </option>
+          <option value="os">
+            Operating Systems
+          </option>
+          <option value="maths">
+            Mathematics
+          </option>
+        `;
+      }
+    });
+  </script>
+
 </body>
 </html>
